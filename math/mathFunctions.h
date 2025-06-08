@@ -312,11 +312,6 @@ namespace math
 		return value > 0 ? 1 : value < 0 ? -1
 			: 0;
 	}
-	// simulates 1 + 2 + 3 + 4 + 5...
-	inline fp calculateIterativeAddition(cfp& iterationCount)
-	{
-		return iterationCount * (iterationCount + 1) * 0.5;
-	}
 
 	inline int floorToBase(cint& val, cint& base)
 	{
@@ -326,5 +321,20 @@ namespace math
 			floored *= base;
 		}
 		return floored;
+	}
+	//returns the area of a triangle consisting of 1x1 squares
+	//straightSideLength 3:
+	//###
+	//## <- 6
+	//#
+	//this also works for fractional values.
+	template<typename T>
+	constexpr T squareTriangleArea(const T& straightSideLength) {
+		return ((straightSideLength + (T)1) * straightSideLength) / (T)2;
+	}
+	// simulates 1 + 2 + 3 + 4 + 5...
+	inline fp calculateIterativeAddition(cfp& iterationCount)
+	{
+		return squareTriangleArea(iterationCount);
 	}
 }

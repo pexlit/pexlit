@@ -82,3 +82,8 @@ constexpr void copyAndCast(const sourceType *const &sourceIt, const sourceType *
                        { return (destType)value; });
     }
 }
+
+template<typename listType, typename otherListType>
+void addArrayToArray(listType& arrayToAddTo, otherListType arrayToAdd) {
+    arrayToAddTo.insert(arrayToAddTo.end(), arrayToAdd.begin(), arrayToAdd.end());
+}

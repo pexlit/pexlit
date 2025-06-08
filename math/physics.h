@@ -35,6 +35,10 @@ inline vec2 AddRelativisticVelocities(vec2 v1, vec2 v2, cfp& c)
 }
 
 //fp because you never know how much iterations you want to speed up...
+//works for any value. for example, we have as timestep 0.5
+//timestep 0: position(0) += velocity (0) + acceleration (1) * calculateIterativeAddition(0.5)->0.375
+//timestep 1: position (0.375) + velocity(0.5) + acceleration (1) * calculateIterativeAddition(0.5)->0.375
+//position = 1
 template<fsize_t dimensionCount>
 inline void predictBehavior(cvecn<dimensionCount>& constantForce, vecn<dimensionCount>& speed, vecn<dimensionCount>& position, cfp& iterationCount)
 {
