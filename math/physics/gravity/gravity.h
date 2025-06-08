@@ -47,9 +47,9 @@ constexpr fp CalculateGravityForce(cfp distancesquared, cfp m1, cfp m2, cfp grav
 }
 //calculates acceleration for object 0
 template<fsize_t dimensionCount>
-constexpr vecn<dimensionCount> calculateAcceleration(cvecn<dimensionCount>& selectedPos0, cvecn<dimensionCount>& selectedPos1, cfp& m1, cfp& gravityConstant, cfp& radius1)
+constexpr vecn<dimensionCount> calculateAcceleration(cvecn<dimensionCount>& centerOfMass0, cvecn<dimensionCount>& centerOfMass1, cfp& m1, cfp& gravityConstant, cfp& radius1)
 {
-	cvec2& difference = selectedPos1 - selectedPos0;
+	cvecn<dimensionCount>& difference = centerOfMass1 - centerOfMass0;
 	cfp& distanceSquared = difference.lengthSquared();
 	if (distanceSquared == 0)
 	{

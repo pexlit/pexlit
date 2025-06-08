@@ -284,25 +284,23 @@ struct vectn
 
 		cint& sina = math::sinDegrees(angle);
 		cint& cosa = math::cosDegrees(angle);
-		using baseVec<T, n>::x;
-		using baseVec<T, n>::y;
 
 		return vectn(
-			x * cosa + y * sina,
-			x * -sina + y * cosa);
+			this->x * cosa + this->y * sina,
+			this->x * -sina + this->y * cosa);
 	}
 
 	// 0 -> 0, 1
 	// pi / 2 -> 1,0
 	// pi -> 0, -1
 	// pi * 1.5 -> -1,0
+	// rotate vector over z axis
 	inline static vectn getrotatedvector(const fp& yaw) {
-		// rotate vector over y axis(pitch)
 		return vectn(sin(yaw), cos(yaw));
 	}
 
+	// rotate vector over z axis, then rotate over rotated x axis
 	inline static vectn getrotatedvector(const T& yaw, const T& pitch) {
-		// rotate vector over y axis(pitch)
 		const T& cosp = cos(pitch), sinp = sin(pitch), siny = sin(yaw), cosy = cos(yaw);
 		return vectn(siny * cosp, cosy * cosp, sinp);
 	}
