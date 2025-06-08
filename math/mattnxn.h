@@ -242,13 +242,13 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 
 	inline static mattnxn rotateDegrees(const vect2<T>& rotateAround, cint& angle)
 	{
-		return combine({// first set rotation point to 0,0
-						translate(-rotateAround),
-
-						// then rotate
-						rotateDegrees(angle),
-						// then move it back
-						translate(rotateAround) });
+		return combine({
+			// then move it back
+			translate(rotateAround),
+			// then rotate
+			rotateDegrees(angle),
+			// first set rotation point to 0,0
+			translate(-rotateAround), });
 	}
 	// clockwise
 	inline static mattnxn rotate(const T& angle)

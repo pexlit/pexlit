@@ -20,24 +20,21 @@ void bodyPart2D::CalculateTransform()
 
 	std::vector<mat3x3> transforms = std::vector<mat3x3>();
 
-	if (flipX)
+	transforms.push_back(mat3x3::translate(translate));
+	if (angle != 0)
 	{
-		transforms.push_back(mat3x3::mirror(axisID::x, -rotationCenter.x + size.x * 0.5));
+		transforms.push_back(mat3x3::rotate(angle));
 	}
 
 	if (flipY)
 	{
 		transforms.push_back(mat3x3::mirror(axisID::y, -rotationCenter.y + size.y * 0.5));
 	}
-
-	if (angle != 0)
+	if (flipX)
 	{
-		transforms.push_back(mat3x3::rotate(angle));
+		transforms.push_back(mat3x3::mirror(axisID::x, -rotationCenter.x + size.x * 0.5));
 	}
 
-
-
-	transforms.push_back(mat3x3::translate(translate));
 	applied = mat3x3::combine(transforms);
 
 	scalecenter = mat3x3::fromRectToRotatedRect(textureRect, textureAngle, crectangle2(-rotationCenter, size));

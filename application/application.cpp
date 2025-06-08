@@ -133,9 +133,11 @@ void application::layout(crectanglei2& newRect)
 	// we can'T directly set the views properties, because sf::view has a center and a size, not a position and a size.
 	window->setView(sf::View(sf::FloatRect({ (float)newRect.x, (float)newRect.y }, { (float)newRect.w, (float)newRect.h })));
 
-	screenToApp = mat3x3::combine({ mat3x3::scale(vec2(1.0 / pixelMultiplier)),
-								   mat3x3::translate(cvec2(0, -newRect.size.y)),
-								   mat3x3::mirror(axisID::y, 0) });
+	screenToApp = mat3x3::combine({
+		mat3x3::mirror(axisID::y, 0),
+		mat3x3::translate(cvec2(0, -newRect.size.y)),
+		mat3x3::scale(vec2(1.0 / pixelMultiplier))
+		});
 	windowTexture->resize({ (uint)newRect.size.x, (uint)newRect.size.y });
 	windowSprite->setTexture(*windowTexture, true);
 	windowSprite->setScale({ 1, -1 });
