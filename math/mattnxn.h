@@ -282,16 +282,21 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		T cosr = (T)cos(angle);
 		T mincos = 1 - cosr;
 		// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
-		mattnxn result{  };
-			result[0][0] = cosr + axis.x * axis.x * mincos,
-			result[0][1] = axis.x* axis.y* mincos - axis.z * sinr,
-			result[0][2] = axis.x* axis.z* mincos + axis.y * sinr},
-			result[1][0] = {axis.y * axis.x * mincos + axis.z * sinr,
-			result[1][1] = cosr + axis.y * axis.y * mincos,
-			result[1][2] = axis.y * axis.z * mincos - axis.x * sinr},
-			result[2][0] = {axis.z * axis.x * mincos - axis.y * sinr,
-			result[2][1] = axis.z * axis.y * mincos + axis.x * sinr,
-			result[2][2] = cosr + axis.z * axis.z * mincos} };
+		mattnxn result{};
+		return mattnxn(
+			vectn<T, cols>(
+				cosr + axis.x * axis.x * mincos,
+				axis.x * axis.y * mincos - axis.z * sinr,
+				axis.x * axis.z * mincos + axis.y * sinr),
+			vectn<T, cols>(
+				axis.y * axis.x * mincos + axis.z * sinr,
+				cosr + axis.y * axis.y * mincos,
+				axis.y * axis.z * mincos - axis.x * sinr),
+			vectn<T, cols>(
+				axis.z * axis.x * mincos - axis.y * sinr,
+				axis.z * axis.y * mincos + axis.x * sinr,
+				cosr + axis.z * axis.z * mincos)
+		);
 		// axis.Normalize();
 		// Matrix lhs = axis;
 		// Matrix cross = Cross(lhs, matrix);
