@@ -283,7 +283,7 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		T mincos = 1 - cosr;
 		// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
 		mattnxn result{};
-		return mattnxn(
+		return mattnxn(vectn<vectn<T, cols>, rows>(
 			vectn<T, cols>(
 				cosr + axis.x * axis.x * mincos,
 				axis.x * axis.y * mincos - axis.z * sinr,
@@ -296,7 +296,7 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 				axis.z * axis.x * mincos - axis.y * sinr,
 				axis.z * axis.y * mincos + axis.x * sinr,
 				cosr + axis.z * axis.z * mincos)
-		);
+		));
 		// axis.Normalize();
 		// Matrix lhs = axis;
 		// Matrix cross = Cross(lhs, matrix);
