@@ -13,6 +13,8 @@
 #include "math/graphics/doubleBuffer.h"
 #include <optimization/stableTickLoop.h>
 
+extern stdPath workingDirectory;
+
 struct application: INamable, IDestructable
 {
 	//WINDOWPLACEMENT g_wpPrev = WINDOWPLACEMENT();

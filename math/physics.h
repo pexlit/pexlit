@@ -39,8 +39,8 @@ inline vec2 AddRelativisticVelocities(vec2 v1, vec2 v2, cfp& c)
 //timestep 0: position(0) += velocity (0) + acceleration (1) * calculateIterativeAddition(0.5)->0.375
 //timestep 1: position (0.375) + velocity(0.5) + acceleration (1) * calculateIterativeAddition(0.5)->0.375
 //position = 1
-template<fsize_t dimensionCount>
-inline void predictBehavior(cvecn<dimensionCount>& constantForce, vecn<dimensionCount>& speed, vecn<dimensionCount>& position, cfp& iterationCount)
+template<typename T>
+inline constexpr void predictBehavior(const T& constantForce, T& speed, T& position, cfp& iterationCount)
 {
 	//now to simulate this behavior:
 	//speed += force;

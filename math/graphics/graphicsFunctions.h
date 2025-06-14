@@ -146,9 +146,14 @@ inline void fillEllipseCentered(const array2d<T>& array, crectangle2& rect, cons
 // https://www.redblobgames.com/grids/line-drawing.html
 // https://www.geeksforgeeks.org/bresenhams-line-generation-algorithm/
 template <typename T, typename brush0Type>
-inline void fillLine(const array2d<T>& array, vec2 p0, vec2 p1, const brush0Type& b)
+inline void fillLine(const array2d<T>& array, cvec2& p0, cvec2& p1, const brush0Type& b)
 {
-	if (cropLine(p0, p1, crectangle2(vec2(), vec2(array.size - 1))))
+	fillLineUnsafeCropped(array, p0, p1, b, array.getClientRect());
+}
+
+template <typename T, typename brush0Type>
+inline void fillLineUnsafeCropped(const array2d<T>& array, vec2 p0, vec2 p1, const brush0Type& b, crectangle2& cropRect) {
+	if (cropLine(p0, p1, crectangle2(cropRect.pos0, vec2(cropRect.size - 1))))
 	{
 		fillLineUnsafe(array, p0, p1, b);
 	}

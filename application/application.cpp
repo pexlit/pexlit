@@ -207,6 +207,9 @@ void application::processInput()
 		{
 			transformEvent(mouse);
 		}
+		else if (const auto scroll = event->getIf<sf::Event::MouseWheelScrolled>()) {
+			transformEvent(scroll);
+		}
 		else if (const auto resized = event->getIf<sf::Event::Resized>())
 		{
 			layout(rectanglei2(cveci2(), veci2(resized->size.x / pixelMultiplier,

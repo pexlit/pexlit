@@ -209,17 +209,19 @@ namespace math
 			: 0;
 	}
 
-	template <typename T>
-	constexpr T powSizeTSimple(const T& value, cfsize_t& power)
+	template <typename T, std::integral PowerType>
+	constexpr T powSizeTSimple(const T& value, PowerType power)
 	{
 		if (power)
 		{
-			T result = value;
-			fsize_t raisedPower = 1;
+			//will get optimized away for unsigned types
+			T result = power < (T)0 ? (T)1 / value : value;
+			power = std::abs(power);
+			PowerType raisedPower = 1;
 
 			while (raisedPower < power)
 			{
-				fsize_t doubleRaisedPower = raisedPower + raisedPower;
+				PowerType doubleRaisedPower = raisedPower + raisedPower;
 
 				cbool& fastMethod = doubleRaisedPower <= power;
 
@@ -333,7 +335,7 @@ namespace math
 		return ((straightSideLength + (T)1) * straightSideLength) / (T)2;
 	}
 	// simulates 1 + 2 + 3 + 4 + 5...
-	inline fp calculateIterativeAddition(cfp& iterationCount)
+	constexpr fp calculateIterativeAddition(cfp& iterationCount)
 	{
 		return squareTriangleArea(iterationCount);
 	}

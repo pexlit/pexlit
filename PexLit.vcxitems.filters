@@ -1,31 +1,80 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Label="Globals">
-    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{81130949-e9ec-41e5-824b-4d4ae463634c}</ItemsProjectGuid>
-  </PropertyGroup>
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-    </ClCompile>
-  </ItemDefinitionGroup>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ProjectCapability Include="SourceItemsFromImports" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\application.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\colorPicker.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\eventTranslator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\form\fileDialog.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\form\form.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\label.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\listControl.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\pictureBox.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\slider.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\textBox.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\touchJoystick.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\initialize.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\interaction.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)array\wstringFunctions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)filesystem\fpng\fpng.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)filesystem\iserializable.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)filesystem\jsonReader.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)interface\idestructable.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\bodypart2d.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\collisions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\frustum.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\font.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\fontfamily.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\color\color.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\resolutiontexture.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\texture.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\video\videoEncoder.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\intersectable.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\intersectableCuboid.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\keyframe.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\LayerNoiseSimplex.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\meshfunctions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\random\random.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\SimplexNoise.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\sound\sound.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\timemath.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\triangle.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\wave\waveShaper.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)network\client\clientInput.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)network\compressedPacket.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)optimization\handleError.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)sound\audio2d.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)sound\audioSource.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)sound\soundHandler2D.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\brush.cpp">
+      <Filter>brush</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes.cpp">
+      <Filter>brush</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\button.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\checkbox.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\control.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\form\messageBox.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\Graph.cpp">
+      <Filter>control</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)application\application.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\applicationrunner.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\button.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\checkbox.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\colorPicker.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\control.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\controlFunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\eventTranslator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\form\fileDialog.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\form\form.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\form\messageBox.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\Graph.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\label.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\listControl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)application\control\pictureBox.h" />
@@ -80,27 +129,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\direction.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\endlessPrecision.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\alignment.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brush.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\alphaMask.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\bilinearInterpolator.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMaximizer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMixer.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMultiplier.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\combineBrush.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthBufferBrush.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\functionPointerBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\grayScaleToTransparency.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\repeatingBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\saturator.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\solidBrush.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\solidColorBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\squareInterpolator.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\vignetteBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\baseFont.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\font.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\fontfamily.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\transformbrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\color\color.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\color\colorFunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\color\colorPalette.h" />
@@ -115,7 +151,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\texture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\textures.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoEncoder.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoWriter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\hashing.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\intersectable.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\intersectableCuboid.h" />
@@ -170,58 +205,68 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)type\EnumTricks.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)type\types.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)windowsIncluder.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthBufferBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\alphaMask.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\combineBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\functionPointerBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\repeatingBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\solidBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\solidColorBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\transformbrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\vignetteBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMaximizer.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMultiplier.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\button.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\checkbox.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\control.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\form\messageBox.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)application\control\Graph.h">
+      <Filter>control</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoWriter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\application.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\button.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\checkbox.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\colorPicker.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\control.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\eventTranslator.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\form\fileDialog.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\form\form.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\form\messageBox.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\Graph.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\label.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\listControl.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\pictureBox.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\slider.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\textBox.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\control\touchJoystick.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\initialize.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)application\interaction.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)array\wstringFunctions.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)filesystem\fpng\fpng.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)filesystem\iserializable.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)filesystem\jsonReader.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)interface\idestructable.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\bodypart2d.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\collisions.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\frustum.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\brush.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\font.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\brush\font\fontfamily.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\color\color.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\resolutiontexture.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\texture.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\graphics\video\videoEncoder.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\intersectable.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\intersectableCuboid.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\keyframe.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\LayerNoiseSimplex.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\meshfunctions.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\random\random.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\SimplexNoise.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\sound\sound.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\timemath.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\triangle.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)math\wave\waveShaper.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)network\client\clientInput.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)network\compressedPacket.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)optimization\handleError.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)sound\audio2d.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)sound\audioSource.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)sound\soundHandler2D.cpp" />
+    <Filter Include="brush">
+      <UniqueIdentifier>{b3cef4c9-3ad6-4b0b-af17-b217003d8acb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="control">
+      <UniqueIdentifier>{2e97ffcc-c96b-4a56-b3f5-49367c5604d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

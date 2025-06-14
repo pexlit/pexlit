@@ -29,7 +29,7 @@ constexpr fp calculateGravityMassInside(cfp& distance, cfp& gravityConstant, cfp
 constexpr fp calculateGravity1(cfp distanceSquared, cfp gravityConstant, cfp radius)
 {
 	cfp radius2 = radius * radius;
-	return distanceSquared < radius ?
+	return distanceSquared < radius2 ?
 		//inside
 		calculateGravity1Inside(sqrt(distanceSquared), gravityConstant, radius * radius2) :
 		//outside

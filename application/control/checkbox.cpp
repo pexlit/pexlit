@@ -1,5 +1,6 @@
 #include "checkbox.h"
 #include "math/graphics/brush/brushes.h"
+#include "Graph.h"
 
 checkBox::checkBox() :control()
 {
