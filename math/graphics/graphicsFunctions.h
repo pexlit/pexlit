@@ -3,6 +3,7 @@
 #include "math/rectangle/rectanglefunctions.h"
 #include "math/graphics/resolutiontexture.h"
 #include "math/graphics/fillRow.h"
+#include <math/sphere/sphere.h>
 
 // the rect should be relative to the default size.
 template <typename brush0Type>
@@ -82,6 +83,95 @@ inline void fillRectangleBorders(const array2d<T>& array, cveci2& pos00, cveci2&
 {
 	fillRectangleBorders(array, crectanglei2(pos00, pos11 - pos00 + 1), borderThickness, b);
 }
+
+template<typename T, typename brush0Type>
+//the camera rotation transform transforms from default axes:
+//forward: 010
+//right: 100
+//up:001
+//fov is the fov of the y axis in radians
+inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere, cvec3& cameraPosition, cmat3x3& cameraRotationTransform, cfp& verticalFov, const brush0Type& brush) {
+	//we're basically rendering a circle, but transforming it because of the rectangular matrix.
+	//the x angle doesn't steadily increase with the pixel x, because the screen is a rectangle and not a spherical surface. if it was, rendering a transformed sphere would be way easier.
+
+
+	//put the camera at 000, the camera pointing to 010, right 100, up 001
+	cvec3& relativeSpherePosition = cameraRotationTransform.inverse().multPointMatrix(sphere.center - cameraPosition);
+
+	cvec2& halfArraySize = array.size * 0.5;
+	cfp& yDistance = relativeSpherePosition.y;
+	//multiply this by a pixel position to get the slope of the ray going from that pixel
+	cfp& verticalFovSlope = tan(verticalFov * 0.5);
+	cfp& horizontalFovSlope = verticalFovSlope * (halfArraySize.x / halfArraySize.y);
+	cfp& horizontalFov = atan(horizontalFovSlope);
+	cfp& pixelToSlope = verticalFovSlope / halfArraySize.y;
+	cfp& slopeToPixel = halfArraySize.y / verticalFovSlope;
+
+	//ray tracing test
+
+	cvec3& right = cameraRotationTransform.multPointMatrix(vec3(1, 0, 0));
+	cvec3& forward = cameraRotationTransform.multPointMatrix(vec3(0, 1, 0));
+	cvec3& up = cameraRotationTransform.multPointMatrix(vec3(0, 0, 1));
+	//the slope of the outer most pixel
+	vec2 mid = (vec2)array.size / 2;
+	cvec3& relativeCameraPosition = cameraPosition - sphere.center;
+	cfp& c = 4 * (vec3::dot(relativeCameraPosition, relativeCameraPosition) - sphere.radius * sphere.radius);
+	//sphere: (x-xc)^2 + (y-yc) ^2 + (z-z2) ^ 2 < r ^ 2
+	//transform: x = (x * a + y * b + z * c + d) / w
+	//           y = (x * e + y * f + z * g + h) / w
+	//           z = (x * i + y * j + z * k + l) / w
+	//           w = x * m + y * n + z * o + p
+	for (veci2 pos : array.getClientRect()) {
+		//change: relative.x += slopeMultiplier
+		vec2 relative = (pos - mid) * pixelToSlope;
+		//change: right * slopeMultiplier
+		vec3 rayDirection = (forward + relative.x * right + relative.y * up);
+		//A^2 + B ^ 2 = C
+		// (A + D) ^ 2 + B ^ 2 = C + AD2 + D ^ 2
+		// assuming right is a single axis
+		//change: (2 * (right * slopeMultiplier) * relative.x + (right * slopeMultiplier) ^ 2)
+		cfp& a = rayDirection.lengthSquared();
+		cfp& b = 2.0 * vec3::dot(relativeCameraPosition, rayDirection);
+		cfp& discriminant = b * b - a * c;
+		//either on exact edge or inside
+		if (discriminant >= 0) {
+			array.setValueUnsafe(pos, colorPalette::red);
+		}
+	}
+
+
+	if (yDistance > sphere.radius) {
+		//the angle at which the center of the sphere resides, seen from the camera
+		cfp& xCenterAngle = atan(relativeSpherePosition.x / yDistance);
+		cfp& yCenterAngle = atan(relativeSpherePosition.z / yDistance);
+
+		//the radius of the sphere in radians when viewed from the camera
+		cfp& angleRadius = asin(sphere.radius / relativeSpherePosition.length());
+		//draw a circle which will fill rows of pixels from a starting angle to an end angle
+		cfp& yStartAngle = yCenterAngle - angleRadius;
+		cfp& yEndAngle = yCenterAngle + angleRadius;
+
+		if (yStartAngle < verticalFov && yEndAngle > -verticalFov && xCenterAngle - angleRadius < horizontalFov && xCenterAngle + angleRadius > -horizontalFov) {
+			cfp& startPixelY = halfArraySize.y + tan(yStartAngle) * slopeToPixel;
+			cfp& endPixelY = halfArraySize.y + tan(yEndAngle) * slopeToPixel;
+
+			typename brush0Type::InputType pixelPosition = typename brush0Type::InputType();
+			for (fp rowY = math::ceil(startPixelY); rowY < endPixelY; rowY++) {
+				cfp& currentYAngle = atan((rowY - halfArraySize.y) * pixelToSlope);
+				cfp& verticalAngleOffset = currentYAngle - yCenterAngle;
+				//the size of the sphere slice (pythagorean theorem)
+				cfp& sliceAngleRadius = std::sqrt(angleRadius * angleRadius - verticalAngleOffset * verticalAngleOffset);
+				cfp& xStartAngle = xCenterAngle - sliceAngleRadius;
+				cfp& xEndAngle = xCenterAngle + sliceAngleRadius;
+				cfp& startPixelX = halfArraySize.x + tan(xStartAngle) * slopeToPixel;
+				cfp& endPixelX = halfArraySize.x + tan(xEndAngle) * slopeToPixel;
+				fillRow(array, (int)rowY, startPixelX, endPixelX, brush);
+			}
+		}
+	}
+
+}
+
 // x, y: pos00 position
 // w, h: width, height
 template <typename T, typename brush0Type>

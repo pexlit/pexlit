@@ -286,15 +286,15 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		return mattnxn(vectn<vectn<T, cols>, rows>(
 			vectn<T, cols>(
 				cosr + axis.x * axis.x * mincos,
-				axis.x * axis.y * mincos - axis.z * sinr,
-				axis.x * axis.z * mincos + axis.y * sinr),
+				axis.x * axis.y * mincos + axis.z * sinr,
+				axis.x * axis.z * mincos - axis.y * sinr),
 			vectn<T, cols>(
-				axis.y * axis.x * mincos + axis.z * sinr,
+				axis.y * axis.x * mincos - axis.z * sinr,
 				cosr + axis.y * axis.y * mincos,
-				axis.y * axis.z * mincos - axis.x * sinr),
+				axis.y * axis.z * mincos + axis.x * sinr),
 			vectn<T, cols>(
-				axis.z * axis.x * mincos - axis.y * sinr,
-				axis.z * axis.y * mincos + axis.x * sinr,
+				axis.z * axis.x * mincos + axis.y * sinr,
+				axis.z * axis.y * mincos - axis.x * sinr,
 				cosr + axis.z * axis.z * mincos)
 		));
 		// axis.Normalize();
@@ -533,10 +533,10 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 	// will bring z to the range [0,1] with 0 being zNear and 1 being zFar
 	// will bring x and y in the range [-1, 1]
 	// glm method
-	inline static constexpr mattnxn perspectiveFov(const T& fov, const vectn<T, 2>& screenSize, const T& zNear, const T& zFar)
+	//fovY: fov of the screens y axis in radians
+	inline static constexpr mattnxn perspectiveFov(const T& fovY, const vectn<T, 2>& screenSize, const T& zNear, const T& zFar)
 	{
-		const T& rad = fov;
-		const T& h = cos((fp)0.5 * rad) / sin((fp)0.5 * rad);
+		const T& h = cos((fp)0.5 * fovY) / sin((fp)0.5 * fovY);
 		const T& w = h * screenSize.y / screenSize.x; /// todo max(width , Height) / min(width , Height)?
 
 		mattnxn result = empty();
@@ -555,6 +555,7 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 	// center: looking at
 	// the view matrix
 	// glm method
+	// right handed!
 	// https://stackoverflow.com/questions/19740463/lookat-function-im-going-crazy
 	// https://stackoverflow.com/questions/21830340/understanding-glmlookat
 	inline static constexpr mattnxn lookat(cvect3<T>& eye, cvect3<T>& center, cvect3<T>& up)
@@ -562,7 +563,8 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		// Create a new coordinate system
 		cvect3<T>& screenz((center - eye).normalized());			   // the look direction
 		cvect3<T>& screenx(vect3<T>::cross(screenz, up).normalized()); // the sideways direction
-		cvect3<T>& screeny(vect3<T>::cross(screenz, screenx));		   // the upwards direction
+		//we need to calculate again, because up isn't guaranteed to be perpendicular to screenz, because the center can be anywhere.
+		cvect3<T>& screeny(vect3<T>::cross(screenx, screenz));		   // the upwards direction.
 
 		mattnxn result = mattnxn();
 		result[0][0] = screenx.x; // the new x

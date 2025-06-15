@@ -1,5 +1,5 @@
 #include "math/sphere/sphere.h"
-//http://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
+//https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection
 //center = vec3(0,0,0)
 inline bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, cfp& radius, fp& t0, fp& t1) {
 	cfp& a = raydirection.lengthSquared();
