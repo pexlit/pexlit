@@ -68,7 +68,6 @@
 	{                                                                                                                                          \
 		newExpression(resultType, (*this)) auto resultPtr = result.begin();                                                                    \
 		auto const &endPtr = end();                                                                                                            \
-		__pragma(loop(ivdep))\
 		for (auto thisPtr = begin(); thisPtr < endPtr; thisPtr++, resultPtr++)                                                                 \
 		{                                                                                                                                      \
 			*resultPtr = *thisPtr o b;                                                                                                         \
@@ -82,7 +81,6 @@
 		auto* __restrict resultPtr = &(*result.begin());                                                                          \
 		auto* __restrict bPtr = &(*b.begin());                                                                                                                 \
 		auto* __restrict thisPtr = &(*begin());\
-		__pragma(loop(ivdep))\
 		for(size_t i = 0; i < arraySize; i++){\
 			resultPtr[i] = thisPtr[i] o bPtr[i];\
 		}\
