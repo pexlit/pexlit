@@ -10,6 +10,8 @@
 #include <array>
 #include "type/conversion.h"
 
+#include <execution>
+
 template<typename T, fsize_t n>
 struct baseVec {
 public:
@@ -94,8 +96,11 @@ public:
 
 template<typename T, fsize_t n>
 // alignment is already a power of two
-struct vectn
-	: public baseVec<T, n> // alignas(((n == 3 || n == 4) && (alignof(T) <= 0x4)) ? (alignof(T) * 0x4) : math::getNextPowerOf2Multiplied(sizeof(T) * n)) vectn
+
+struct
+	alignas(sizeof(T) > 8 ? 0x20 : ((n == 3 || n == 4) && (alignof(T) <= 0x4)) ? (alignof(T) * 0x4) : math::getNextPowerOf2Multiplied(sizeof(T) * n))
+	vectn
+	: public baseVec<T, n>
 {
 	static constexpr fsize_t axisCount = n;
 	typedef T axisType;
@@ -414,7 +419,7 @@ struct vectn
 
 #define newMacro(type, copySize) vectn<type COMMA n> result = vectn<type COMMA n>();
 
-	addOperators(newMacro, vectn, wrap(vectn<t2, n>), constexpr)
+	addOperators(newMacro, vectn, wrap(vectn<t2, n>), constexpr,n)
 
 #undef newMacro
 		//#pragma optimize ("", off)

@@ -94,16 +94,17 @@ inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere,
 	//we're basically rendering a circle, but transforming it because of the rectangular matrix.
 	//the x angle doesn't steadily increase with the pixel x, because the screen is a rectangle and not a spherical surface. if it was, rendering a transformed sphere would be way easier.
 
+	//https://www.desmos.com/calculator/1cfdfeyr9c
 
 	//put the camera at 000, the camera pointing to 010, right 100, up 001
 	cvec3& relativeSpherePosition = cameraRotationTransform.inverse().multPointMatrix(sphere.center - cameraPosition);
 
-	cvec2& halfArraySize = array.size * 0.5;
-	cfp& yDistance = relativeSpherePosition.y;
-	//multiply this by a pixel position to get the slope of the ray going from that pixel
+	cvec2& halfArraySize = array.size * (fp)0.5;
+
 	cfp& verticalFovSlope = tan(verticalFov * 0.5);
 	cfp& horizontalFovSlope = verticalFovSlope * (halfArraySize.x / halfArraySize.y);
-	cfp& horizontalFov = atan(horizontalFovSlope);
+
+	//multiply this by a pixel position to get the slope of a ray with z 1 (unnormalized) going from that pixel
 	cfp& pixelToSlope = verticalFovSlope / halfArraySize.y;
 	cfp& slopeToPixel = halfArraySize.y / verticalFovSlope;
 
@@ -112,62 +113,81 @@ inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere,
 	cvec3& right = cameraRotationTransform.multPointMatrix(vec3(1, 0, 0));
 	cvec3& forward = cameraRotationTransform.multPointMatrix(vec3(0, 1, 0));
 	cvec3& up = cameraRotationTransform.multPointMatrix(vec3(0, 0, 1));
+
 	//the slope of the outer most pixel
-	vec2 mid = (vec2)array.size / 2;
 	cvec3& relativeCameraPosition = cameraPosition - sphere.center;
-	cfp& c = 4 * (vec3::dot(relativeCameraPosition, relativeCameraPosition) - sphere.radius * sphere.radius);
-	//sphere: (x-xc)^2 + (y-yc) ^2 + (z-z2) ^ 2 < r ^ 2
-	//transform: x = (x * a + y * b + z * c + d) / w
-	//           y = (x * e + y * f + z * g + h) / w
-	//           z = (x * i + y * j + z * k + l) / w
-	//           w = x * m + y * n + z * o + p
-	for (veci2 pos : array.getClientRect()) {
-		//change: relative.x += slopeMultiplier
-		vec2 relative = (pos - mid) * pixelToSlope;
-		//change: right * slopeMultiplier
-		vec3 rayDirection = (forward + relative.x * right + relative.y * up);
-		//A^2 + B ^ 2 = C
-		// (A + D) ^ 2 + B ^ 2 = C + AD2 + D ^ 2
-		// assuming right is a single axis
-		//change: (2 * (right * slopeMultiplier) * relative.x + (right * slopeMultiplier) ^ 2)
-		cfp& a = rayDirection.lengthSquared();
-		cfp& b = 2.0 * vec3::dot(relativeCameraPosition, rayDirection);
-		cfp& discriminant = b * b - a * c;
-		//either on exact edge or inside
-		if (discriminant >= 0) {
-			array.setValueUnsafe(pos, colorPalette::red);
-		}
-	}
 
+	//swap y and z
+	cvec3& transformedSpherePosition = vec3(relativeSpherePosition.x, relativeSpherePosition.z, relativeSpherePosition.y);
+	if (transformedSpherePosition.z > -sphere.radius) {
+		//https://math.stackexchange.com/questions/1367710/perspective-projection-of-a-sphere-on-a-plane
+		//a sphere projected onto a plane is always an ellipse.
+		//the projection has the shape of a cone with the apex (cross point) at the camera (0 0 0)
+		//the ellipse is basically a conic section (a slice of the cone)
+		//formula: (x * a + y * b + z * c) ^ 2 - (x ^ 2 + y ^ 2 + z ^ 2) * (a ^ 2 + b ^ 2 + c ^ 2 - r ^ 2) = 0
+		// https://www.desmos.com/calculator/xw2dnkppci
+		// a,b,c:sphere center x, y, z
+		// r: sphere radius
+		// z: plane z
+		//simplify:
+		// (a ^ 2 + b ^ 2 + c ^ 2 - r ^ 2) = distance from sphere, can be precalculated
+		// d: distance from sphere
+		//formula: (x * a + y * b + z * c) ^ 2 - (x ^ 2 + y ^ 2 + z ^ 2) * d= 0
+		// z is always 1
+		//formula: (x * a + y * b + c) ^ 2 - (x ^ 2 + y ^ 2 + 1) * d= 0
+		//https://web.archive.org/web/20180309160831/http://home.scarlet.be:80/math/reduc.htm
+		//orthonormal axis: length of 1 and orthogonal (90 degrees angles between them)
+		// higher bound (found using chatGpt, lowerbound = -sqrt):
+		//y=(-bcz+\sqrt{b^{2}c^{2}z^{2}-(r^{2}-c^{2})(r^{2}-b^{2})z^{2}})/(c^{2}-r^{2})
+		cfp& radiusSquared = sphere.radius * sphere.radius;
+		//square each component
+		cvec3& sphereCenterSquared = math::squared(transformedSpherePosition);
 
-	if (yDistance > sphere.radius) {
-		//the angle at which the center of the sphere resides, seen from the camera
-		cfp& xCenterAngle = atan(relativeSpherePosition.x / yDistance);
-		cfp& yCenterAngle = atan(relativeSpherePosition.z / yDistance);
+		cfp& sphereDistanceSquared = sphereCenterSquared.sum() - radiusSquared;
+		cfp& planeZ = 1;
+		cfp& planeZSquared = planeZ * planeZ;
 
-		//the radius of the sphere in radians when viewed from the camera
-		cfp& angleRadius = asin(sphere.radius / relativeSpherePosition.length());
-		//draw a circle which will fill rows of pixels from a starting angle to an end angle
-		cfp& yStartAngle = yCenterAngle - angleRadius;
-		cfp& yEndAngle = yCenterAngle + angleRadius;
+		auto calculateBounds = [&sphereCenterSquared, &transformedSpherePosition, &planeZ, &planeZSquared, &radiusSquared] <axisID axis, bool upper>() {
+			//the lower bound on a plane with z = planeZ
+			cfp& positiveOrNegative = std::sqrt(sphereCenterSquared[axis] * sphereCenterSquared.z * planeZSquared - (radiusSquared - sphereCenterSquared.z) * (radiusSquared - sphereCenterSquared[axis]) * planeZSquared);
 
-		if (yStartAngle < verticalFov && yEndAngle > -verticalFov && xCenterAngle - angleRadius < horizontalFov && xCenterAngle + angleRadius > -horizontalFov) {
-			cfp& startPixelY = halfArraySize.y + tan(yStartAngle) * slopeToPixel;
-			cfp& endPixelY = halfArraySize.y + tan(yEndAngle) * slopeToPixel;
-
-			typename brush0Type::InputType pixelPosition = typename brush0Type::InputType();
-			for (fp rowY = math::ceil(startPixelY); rowY < endPixelY; rowY++) {
-				cfp& currentYAngle = atan((rowY - halfArraySize.y) * pixelToSlope);
-				cfp& verticalAngleOffset = currentYAngle - yCenterAngle;
-				//the size of the sphere slice (pythagorean theorem)
-				cfp& sliceAngleRadius = std::sqrt(angleRadius * angleRadius - verticalAngleOffset * verticalAngleOffset);
-				cfp& xStartAngle = xCenterAngle - sliceAngleRadius;
-				cfp& xEndAngle = xCenterAngle + sliceAngleRadius;
-				cfp& startPixelX = halfArraySize.x + tan(xStartAngle) * slopeToPixel;
-				cfp& endPixelX = halfArraySize.x + tan(xEndAngle) * slopeToPixel;
-				fillRow(array, (int)rowY, startPixelX, endPixelX, brush);
+			cfp& bzc = transformedSpherePosition[axis] * transformedSpherePosition.z * planeZ;
+			if constexpr (upper) {
+				return (bzc + positiveOrNegative) / (sphereCenterSquared.z - radiusSquared);
 			}
+			else {
+				return (bzc - positiveOrNegative) / (sphereCenterSquared.z - radiusSquared);
+			}
+		};
+
+		cfp& lowerBoundSlope = calculateBounds.template operator() < axisID::y, false > ();
+		cfp& upperBoundSlope = calculateBounds.template operator() < axisID::y, true > ();
+
+		if (lowerBoundSlope < verticalFovSlope && upperBoundSlope > -verticalFovSlope) {
+			cfp& lowerBoundPixels = math::maximum(halfArraySize.y + lowerBoundSlope * slopeToPixel, (fp)0);
+			cfp& upperBoundPixels = math::minimum(halfArraySize.y + upperBoundSlope * slopeToPixel, (fp)array.size.y);
+			//now the same but with x, so we swap all y's for x:
+			cfp& minXSlope = calculateBounds.template operator() < axisID::x, false > ();
+			cfp& maxXSlope = calculateBounds.template operator() < axisID::x, true > ();
+			if (minXSlope < horizontalFovSlope && maxXSlope > -horizontalFovSlope) {
+				for (fp yRow = std::ceil(lowerBoundPixels); yRow < upperBoundPixels; yRow++) {
+					fp ySlope = (yRow - halfArraySize.y) * pixelToSlope;
+					cfp& ySlopeSquared = ySlope * ySlope;
+					//formula to find max y for given Y:
+					//x=(a*(b*y+c*z)+\sqrt{(a^{2}+b^{2}+c^{2}-r^{2})*((r^{2}-c^{2})*y^{2}+2*b*c*y*z+(r^{2}-b^{2})*z^{2})})/(b^{2}+c^{2}-r^{2})
+					cfp& adder = transformedSpherePosition.x * (transformedSpherePosition.y * ySlope + transformedSpherePosition.z * planeZ);
+					cfp& positiveOrNegative = std::sqrt(sphereDistanceSquared * ((radiusSquared - sphereCenterSquared.z) * ySlopeSquared + 2 * transformedSpherePosition.y * transformedSpherePosition.z * ySlope * planeZ + (radiusSquared - sphereCenterSquared.y) * planeZSquared));
+					cfp& divider = sphereCenterSquared.y + sphereCenterSquared.z - radiusSquared;
+					cfp& minX = (adder - positiveOrNegative) / divider;
+					cfp& maxX = (adder + positiveOrNegative) / divider;
+					fillRow(array, (int)yRow, halfArraySize.x + minX * slopeToPixel, halfArraySize.x + maxX * slopeToPixel, brush);
+				}
+			}
+			//fillLine(array, vec2(0, lowerBoundPixels), vec2(array.size.x, lowerBoundPixels), brushes::green);
+			//fillLine(array, vec2(0, upperBoundPixels), vec2(array.size.x, upperBoundPixels), brushes::green);
 		}
+
+
 	}
 
 }

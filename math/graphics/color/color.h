@@ -187,7 +187,7 @@ struct colortn : public vectn<T, channelCount>
 	}
 	#define newMacro(type, copySize) colortn<type COMMA channelCount> result = colortn<type COMMA channelCount>();
 	
-		addOperators(newMacro, colortn, wrap(colortn<t2, channelCount>), constexpr)
+		addOperators(newMacro, colortn, wrap(colortn<t2, channelCount>), constexpr, channelCount)
 	
 	#undef newMacro
 };

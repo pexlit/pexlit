@@ -120,7 +120,7 @@ struct arraynd
 	}
 
 #define newMacro(type, copySize) arraynd<type COMMA n> result = arraynd<type COMMA n>((copySize).size);
-	addOperators(newMacro, arraynd, arraynd<t2 COMMA n>, inline)
+	addOperators(newMacro, arraynd, arraynd<t2 COMMA n>, inline, size.volume())
 #undef newMacro
 
 		// in = y

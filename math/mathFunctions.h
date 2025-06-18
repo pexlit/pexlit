@@ -16,6 +16,20 @@ namespace math
 	constexpr fp fpepsilon = 0.0001;
 	constexpr fp averageSinusHillValue = 2.0 / PI;
 
+	template<typename T>
+	constexpr T cbrt(const T& x, const T& curr, const T& prev)
+	{
+		return curr == prev ? curr : cbrt(x, ((T)2 * curr + x / (curr * curr)) / (T)3, curr);
+	}
+
+	template<typename T>
+	constexpr T cbrt(const T& x)
+	{
+		return x >= (T)0 && std::is_integral_v<T> || x < std::numeric_limits<T>::infinity()
+			? cbrt(x, x, (T)0)
+			: std::numeric_limits<T>::quiet_NaN();
+	}
+
 	template <typename T>
 	constexpr T sqrt(const T& x, const T& curr, const T& prev)
 	{

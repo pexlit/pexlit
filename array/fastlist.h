@@ -153,11 +153,9 @@ struct fastList : IDestructable
 		{
 			generateMask();
 		}
-		if (mask[index] != eraseindicator)
-		{
-			newSize--;
-			mask[index] = eraseindicator;
-		}
+		//true will be converted to 1, false to 0
+		newSize -= mask[index];
+		mask[index] = eraseindicator;
 	}
 
 	inline void erase(const T *const &pointer)

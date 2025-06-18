@@ -62,12 +62,13 @@
 	constructorType structName &operator=(const structName &other) = default;
 
 // newexpression should be a macro that creates a new instance with the same size as the argument
-#define addOperator(o, newExpression, structType, otherStructType, functionType)                                                               \
+#define addOperator(o, newExpression, structType, otherStructType, functionType, arraySize)                                                               \
 	template <typename t2, typename resultType = decltype(std::declval<T>() o std::declval<t2>())>\
 	functionType decltype(auto) operator o(const t2 &b) const requires (std::is_arithmetic_v<t2>)                                                                                 \
 	{                                                                                                                                          \
 		newExpression(resultType, (*this)) auto resultPtr = result.begin();                                                                    \
 		auto const &endPtr = end();                                                                                                            \
+		__pragma(loop(ivdep))\
 		for (auto thisPtr = begin(); thisPtr < endPtr; thisPtr++, resultPtr++)                                                                 \
 		{                                                                                                                                      \
 			*resultPtr = *thisPtr o b;                                                                                                         \
@@ -75,15 +76,16 @@
 		return result;                                                                                                                         \
 	}                                                                                                                                          \
 	template <typename t2, typename resultType = decltype(std::declval<T>() o std::declval<t2>())>                                             \
-	functionType decltype(auto) operator o(const otherStructType &b) const                                                                     \
+	functionType decltype(auto) operator o(const otherStructType b) const                                                                     \
 	{                                                                                                                                          \
-		newExpression(resultType, b) auto resultPtr = result.begin();                                                                          \
-		auto const &endPtr = end();                                                                                                            \
-		auto bPtr = b.begin();                                                                                                                 \
-		for (auto thisPtr = begin(); thisPtr < endPtr; thisPtr++, resultPtr++, bPtr++)                                                         \
-		{                                                                                                                                      \
-			*resultPtr = *thisPtr o(*bPtr);                                                                                                    \
-		}                                                                                                                                      \
+		newExpression(resultType, b)\
+		auto* __restrict resultPtr = &(*result.begin());                                                                          \
+		auto* __restrict bPtr = &(*b.begin());                                                                                                                 \
+		auto* __restrict thisPtr = &(*begin());\
+		__pragma(loop(ivdep))\
+		for(size_t i = 0; i < arraySize; i++){\
+			resultPtr[i] = thisPtr[i] o bPtr[i];\
+		}\
 		return result;                                                                                                                         \
 	}                                                                                                                                          \
 	template <typename t2, typename resultType = decltype(std::declval<T>() o std::declval<t2>())>\
@@ -118,11 +120,11 @@
 		return *this; \
 	}
 
-#define addOperators(newExpression, structType, otherStructType, functionType)             \
-	addOperator(+, newExpression, structType, wrap(otherStructType), functionType)         \
-		addOperator(-, newExpression, structType, wrap(otherStructType), functionType)     \
-			addOperator(*, newExpression, structType, wrap(otherStructType), functionType) \
-				addOperator(/, newExpression, structType, wrap(otherStructType), functionType)
+#define addOperators(newExpression, structType, otherStructType, functionType, arraySize)             \
+	addOperator(+, newExpression, structType, wrap(otherStructType), functionType, arraySize)         \
+		addOperator(-, newExpression, structType, wrap(otherStructType), functionType, arraySize)     \
+			addOperator(*, newExpression, structType, wrap(otherStructType), functionType, arraySize) \
+				addOperator(/, newExpression, structType, wrap(otherStructType), functionType, arraySize)
 
 #define addAssignmentOperator(structName, functionType) \
 	functionType structName &operator=(structName copy) \

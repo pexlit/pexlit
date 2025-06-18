@@ -53,7 +53,7 @@ struct fastArray :IDestructable
 	}
 
 #define newMacro(type, copySize) fastArray<type> result = fastArray<type>((copySize).size);
-	addOperators(newMacro, fastArray, fastArray<t2>, inline)
+	addOperators(newMacro, fastArray, fastArray<t2>, inline, size)
 #undef newMacro
 
 		inline T& getPointerValue(T* const& ptr) const
