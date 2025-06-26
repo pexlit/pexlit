@@ -62,8 +62,8 @@ struct eventHandler {
 	}
 
 	//member functions
-	template<typename memberFunctionType, typename structType>
-	constexpr void hook(memberFunctionType memberFunction, structType* structToBindTo) {
+	template<typename structType, typename memberFunctionType>
+	constexpr void hook(structType* structToBindTo, memberFunctionType memberFunction) {
 		functionType f = std::bind(memberFunction, structToBindTo, std::placeholders::_1);
 		return hook(f);
 	}

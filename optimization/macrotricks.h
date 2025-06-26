@@ -100,12 +100,7 @@
 	template <typename t2>                                                                                                                     \
 	functionType structType& operator o##=(const otherStructType &b)                                                                            \
 	{                                                                                                                                          \
-		auto const &endPtr = end();                                                                                                            \
-		auto bPtr = b.begin();                                                                                                                 \
-		for (auto thisPtr = begin(); thisPtr < endPtr; thisPtr++, bPtr++)                                                                      \
-		{                                                                                                                                      \
-			*thisPtr o## = (*bPtr);                                                                                                            \
-		}                                                                                                                                      \
+		*this = *this o b;                                                                                                            \
 		return *this;                                                                                                                       \
 	}                                                                                                                                          \
 	template <typename t2>                                                                                                                     \

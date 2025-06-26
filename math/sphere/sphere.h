@@ -1,11 +1,11 @@
 #include "math/vector/vectn.h"
 #pragma once
-struct sphere
+struct Sphere
 {
 	vec3 center;
 	fp radius;
-	sphere(cvec3 &center, cfp &radius) : center(center), radius(radius)
+	Sphere(cvec3 &center, cfp &radius) : center(center), radius(radius)
 	{
 	}
-	sphere() = default;
+	Sphere() = default;
 };

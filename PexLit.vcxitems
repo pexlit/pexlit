@@ -110,6 +110,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\graphicsFunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\imageLoader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\imageWriter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\PixelOrientation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\resolutiontexture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\stbincluder.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\texture.h" />
@@ -129,8 +130,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\meshfunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\octreenode.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\physics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\physics\gravity\BarnesHutTile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\physics\gravity\gravity.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\physics\RigidBody.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\point3.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\quaternion\Quaternion.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\random\random.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\random\randomBytes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\random\shufflerandom.h" />
@@ -142,7 +146,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\rectangle\rectangletn.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\SimplexNoise.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sound\sound.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\sphere.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\Sphere.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\sphereCollisions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\tile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\timemath.h" />

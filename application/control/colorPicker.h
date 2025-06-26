@@ -15,4 +15,5 @@ struct colorPicker :public control
 
 	colorPicker();
 	virtual void layout(crectanglei2& newRect) override;
+	void childValueChanged(const valueEventArgs& args);
 };

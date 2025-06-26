@@ -6,7 +6,8 @@
 
 // bgra structure
 template <typename T, fsize_t channelCount>
-struct colortn : public vectn<T, channelCount>
+struct 
+	colortn : public vectn<T, channelCount>
 {
 	typedef vectn<T, channelCount> base;
 	typedef T channelType;

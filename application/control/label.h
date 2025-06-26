@@ -1,7 +1,7 @@
 #include "control.h"
 
 #pragma once
-struct label :public control
+struct Label :public control
 {
-	label(const std::wstring& text = std::wstring());
+	Label(const std::wstring& text = std::wstring());
 };

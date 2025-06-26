@@ -31,7 +31,14 @@ struct videoWriter {
 		if (newFrame.size != size)
 			throw "wrong dimensions";
 		array2d<colorRGB> frame{ newFrame.size, false };
-		std::transform(newFrame.begin(), newFrame.end(), frame.begin(), [](color in) { return colorRGB(in.b(), in.g(), in.r()); });
+		colorRGB* destPtr = frame.end();
+		for (color* sourcePtr = newFrame.begin(); sourcePtr < newFrame.end(); ) {
+			destPtr -= size.x;
+			color* sourceEndPtr = sourcePtr + size.x;
+			std::transform(sourcePtr, sourceEndPtr, destPtr, [](color in) { return colorRGB(in.b(), in.g(), in.r()); });
+			sourcePtr = sourceEndPtr;
+		}
+		
 
 		// Write raw frame to ffmpeg’s stdin
 		fwrite((byte*)frame.baseArray, 1, (byte*)frame.end() - (byte*)frame.begin(), pipe);

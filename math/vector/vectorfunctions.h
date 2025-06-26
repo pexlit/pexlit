@@ -24,10 +24,10 @@ constexpr vectn<outputType, axisCount> ceilVector(const vectn<InputType, axisCou
 
 // https://www.omnicalculator.com/math/angle-between-two-vectors
 // a and b have to be NORMALIZED
-template <typename T>
-inline fp angleBetween(const vect2<T>& a, const vect2<T>& b)
+template <typename T, fsize_t N>
+inline fp angleBetween(const vectn<T, N>& a, const vectn<T, N>& b)
 {
-	return acos(vec2::dot(a, b));
+	return std::acos(vectn<T, N>::dot(a, b));
 }
 
 // y is greater at the top
@@ -117,4 +117,20 @@ constexpr fp distanceToLineSegment(cvec2& lineStart, cvec2& lineEnd, cvec2& p)
 	cfp& T = math::clamp(vec2::dot(p - lineStart, lineEnd - lineStart) / l2, (fp)0, (fp)1);
 	const cvec2& projection = math::lerp(lineStart, lineEnd, T); // Projection falls on the segment
 	return (p - projection).length();
+}
+
+//originalDirection: the direction to make perpendicular.
+//planeNormal: the normal of the plane on which the originalDirection should lie
+inline vec3 makePerpendicular(cvec3& originalDirection, cvec3& planeNormal) {
+	cvec3 thirdAxis = vec3::cross(planeNormal, originalDirection).normalized();
+	return vec3::cross(thirdAxis, planeNormal).normalized();
+}
+
+//originalDirection: the direction to make perpendicular.
+//planeAxis#: the axes of the plane on which the originalDirection should lie
+inline vec3 makePerpendicular(cvec3& originalDirection, cvec3& planeAxis1, cvec3& planeAxis2) {
+	//we got two of those, so let's find the perfect perpendicular position.
+	vec3 perp = vec3::cross(planeAxis1, planeAxis2).normalized();
+	//when it's the other side, flip
+	return perp * math::sign(vec3::dot(perp, originalDirection));
 }

@@ -4,6 +4,7 @@
 #include "math/graphics/resolutiontexture.h"
 #include "math/graphics/fillRow.h"
 #include <math/sphere/sphere.h>
+#include <math/graphics/PixelOrientation.h>
 
 // the rect should be relative to the default size.
 template <typename brush0Type>
@@ -90,36 +91,22 @@ template<typename T, typename brush0Type>
 //right: 100
 //up:001
 //fov is the fov of the y axis in radians
-inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere, cvec3& cameraPosition, cmat3x3& cameraRotationTransform, cfp& verticalFov, const brush0Type& brush) {
+inline void fillTransformedSphere(const array2d<T>& array, const Sphere& sphere, cvec3& cameraPosition, cmat3x3& cameraRotationTransform, cfp& verticalFov, const brush0Type& brush) {
 	//we're basically rendering a circle, but transforming it because of the rectangular matrix.
 	//the x angle doesn't steadily increase with the pixel x, because the screen is a rectangle and not a spherical surface. if it was, rendering a transformed sphere would be way easier.
 
 	//https://www.desmos.com/calculator/1cfdfeyr9c
 
-	//put the camera at 000, the camera pointing to 010, right 100, up 001
-	cvec3& relativeSpherePosition = cameraRotationTransform.inverse().multPointMatrix(sphere.center - cameraPosition);
+	//put the camera at 000, the camera pointing to 010, right 100, up 001. sphere radius is always 1.
+	cvec3& relativeSpherePosition = cameraRotationTransform.inverse().multPointMatrix(sphere.center - cameraPosition) / sphere.radius;
+	constexpr fp normalizedSphereRadius = 1;
 
-	cvec2& halfArraySize = array.size * (fp)0.5;
 
-	cfp& verticalFovSlope = tan(verticalFov * 0.5);
-	cfp& horizontalFovSlope = verticalFovSlope * (halfArraySize.x / halfArraySize.y);
-
-	//multiply this by a pixel position to get the slope of a ray with z 1 (unnormalized) going from that pixel
-	cfp& pixelToSlope = verticalFovSlope / halfArraySize.y;
-	cfp& slopeToPixel = halfArraySize.y / verticalFovSlope;
-
-	//ray tracing test
-
-	cvec3& right = cameraRotationTransform.multPointMatrix(vec3(1, 0, 0));
-	cvec3& forward = cameraRotationTransform.multPointMatrix(vec3(0, 1, 0));
-	cvec3& up = cameraRotationTransform.multPointMatrix(vec3(0, 0, 1));
-
-	//the slope of the outer most pixel
-	cvec3& relativeCameraPosition = cameraPosition - sphere.center;
+	PixelOrientation orientation{ array.size, verticalFov };
 
 	//swap y and z
 	cvec3& transformedSpherePosition = vec3(relativeSpherePosition.x, relativeSpherePosition.z, relativeSpherePosition.y);
-	if (transformedSpherePosition.z > -sphere.radius) {
+	if (transformedSpherePosition.z > -normalizedSphereRadius) {
 		//https://math.stackexchange.com/questions/1367710/perspective-projection-of-a-sphere-on-a-plane
 		//a sphere projected onto a plane is always an ellipse.
 		//the projection has the shape of a cone with the apex (cross point) at the camera (0 0 0)
@@ -139,7 +126,7 @@ inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere,
 		//orthonormal axis: length of 1 and orthogonal (90 degrees angles between them)
 		// higher bound (found using chatGpt, lowerbound = -sqrt):
 		//y=(-bcz+\sqrt{b^{2}c^{2}z^{2}-(r^{2}-c^{2})(r^{2}-b^{2})z^{2}})/(c^{2}-r^{2})
-		cfp& radiusSquared = sphere.radius * sphere.radius;
+		constexpr fp radiusSquared = normalizedSphereRadius * normalizedSphereRadius;
 		//square each component
 		cvec3& sphereCenterSquared = math::squared(transformedSpherePosition);
 
@@ -163,15 +150,15 @@ inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere,
 		cfp& lowerBoundSlope = calculateBounds.template operator() < axisID::y, false > ();
 		cfp& upperBoundSlope = calculateBounds.template operator() < axisID::y, true > ();
 
-		if (lowerBoundSlope < verticalFovSlope && upperBoundSlope > -verticalFovSlope) {
-			cfp& lowerBoundPixels = math::maximum(halfArraySize.y + lowerBoundSlope * slopeToPixel, (fp)0);
-			cfp& upperBoundPixels = math::minimum(halfArraySize.y + upperBoundSlope * slopeToPixel, (fp)array.size.y);
+		if (lowerBoundSlope < orientation.fovSlope.y && upperBoundSlope > -orientation.fovSlope.y) {
+			cfp& lowerBoundPixels = math::maximum(orientation.halfScreenSize.y + lowerBoundSlope * orientation.slopeToPixel, (fp)0);
+			cfp& upperBoundPixels = math::minimum(orientation.halfScreenSize.y + upperBoundSlope * orientation.slopeToPixel, (fp)array.size.y);
 			//now the same but with x, so we swap all y's for x:
 			cfp& minXSlope = calculateBounds.template operator() < axisID::x, false > ();
 			cfp& maxXSlope = calculateBounds.template operator() < axisID::x, true > ();
-			if (minXSlope < horizontalFovSlope && maxXSlope > -horizontalFovSlope) {
+			if (minXSlope < orientation.fovSlope.x && maxXSlope > -orientation.fovSlope.x) {
 				for (fp yRow = std::ceil(lowerBoundPixels); yRow < upperBoundPixels; yRow++) {
-					fp ySlope = (yRow - halfArraySize.y) * pixelToSlope;
+					fp ySlope = (yRow - orientation.halfScreenSize.y) * orientation.pixelToSlope;
 					cfp& ySlopeSquared = ySlope * ySlope;
 					//formula to find max y for given Y:
 					//x=(a*(b*y+c*z)+\sqrt{(a^{2}+b^{2}+c^{2}-r^{2})*((r^{2}-c^{2})*y^{2}+2*b*c*y*z+(r^{2}-b^{2})*z^{2})})/(b^{2}+c^{2}-r^{2})
@@ -180,7 +167,7 @@ inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere,
 					cfp& divider = sphereCenterSquared.y + sphereCenterSquared.z - radiusSquared;
 					cfp& minX = (adder - positiveOrNegative) / divider;
 					cfp& maxX = (adder + positiveOrNegative) / divider;
-					fillRow(array, (int)yRow, halfArraySize.x + minX * slopeToPixel, halfArraySize.x + maxX * slopeToPixel, brush);
+					fillRow(array, (int)yRow, orientation.halfScreenSize.x + minX * orientation.slopeToPixel, orientation.halfScreenSize.x + maxX * orientation.slopeToPixel, brush);
 				}
 			}
 			//fillLine(array, vec2(0, lowerBoundPixels), vec2(array.size.x, lowerBoundPixels), brushes::green);
@@ -191,7 +178,44 @@ inline void fillTransformedSphere(const array2d<T>& array, const sphere& sphere,
 	}
 
 }
+template <typename T, typename brush0Type>
+inline void fillTransformedLine(cvec3& p0, cvec3& p1, const mat4x4& transform, const array2d<T>& array, const brush0Type& brush) {
+	vec4 perspectiveP0 = transform.multPointMatrix<4>(p0);
+	perspectiveP0 /= perspectiveP0.w;
+	vec4 perspectiveP1 = transform.multPointMatrix<4>(p1);
+	perspectiveP1 /= perspectiveP1.w;
+	constexpr fp nearPlane = -1;
+	vec2 screenP0 = vec2(perspectiveP0), screenP1 = vec2(perspectiveP1);
+	//clip
+	if (perspectiveP0.z < nearPlane) {
+		if (perspectiveP1.z < nearPlane) {
+			return;
+		}
+		else {
+			screenP0 = math::lerp(screenP1, screenP0, (perspectiveP1.z - nearPlane) / (perspectiveP1.z - perspectiveP0.z));
+		}
+	}
+	else if (perspectiveP1.z < nearPlane) {
+		screenP1 = math::lerp(screenP0, screenP1, (perspectiveP0.z - nearPlane) / (perspectiveP0.z - perspectiveP1.z));
+	}
+	fillLine(array, screenP0, screenP1, brush);
+	//now cut the line right where it hits the near plane (at a Z of -1)
 
+}
+
+inline void renderAxes(const mat4x4& transform, const texture& renderTarget) {
+	constexpr color axisColors[] = {
+		colorPalette::red,
+		colorPalette::green,
+		colorPalette::blue
+	};
+	//render axes
+	for (int axis = 0; axis < 3; axis++) {
+		vec3 directionVector = vec3();
+		directionVector[axis] = 1;
+		fillTransformedLine(vec3(), directionVector, transform, renderTarget, solidColorBrush(axisColors[axis]));
+	}
+}
 // x, y: pos00 position
 // w, h: width, height
 template <typename T, typename brush0Type>

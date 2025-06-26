@@ -8,7 +8,7 @@ messageBox::messageBox(const std::wstring message, const std::vector<std::wstrin
     {
         button *b = new button(buttonText);
         addChildren({b});
-        b->onClick.hook(&messageBox::onButtonClick, this);
+        b->onClick.hook(this, &messageBox::onButtonClick);
     }
 }
 

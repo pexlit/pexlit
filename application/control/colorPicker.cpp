@@ -6,6 +6,7 @@ colorPicker::colorPicker()
 	for (fsize_t channel = 0; channel < bgraColorChannelCount; channel++)
 	{
 		channelSliders[channel] = new slider(0, 255, 0);
+		channelSliders[channel]->onValueChanged.hook(this, &colorPicker::childValueChanged);
 		channelBoxes[channel] = new textBox();
 		children.push_back(channelSliders[channel]);
 		children.push_back(channelBoxes[channel]);
@@ -33,6 +34,18 @@ void colorPicker::layout(crectanglei2& newRect)
 		channelSliders[channel]->layout(crectanglei2(channelSliderX, newRect.y + newRect.h - channelSliderHeight * (channel + 1), channelTextboxX - channelSliderX, channelSliderHeight));
 		channelBoxes[channel]->layout(crectanglei2(channelTextboxX, newRect.y + newRect.h - channelSliderHeight * (channel + 1), (newRect.x + newRect.w) - channelTextboxX, channelSliderHeight));
 	}
+	control::layout(newRect);
+}
+void colorPicker::childValueChanged(const valueEventArgs& args)
+{
+	for (int channel = 0; channel < (int)bgraColorChannelCount; channel++)
+	{
+		if (&args.sender == channelSliders[channel]) {
+			currentColor[channel] = channelSliders[channel]->value;
+			break;
+		}
+	}
+	colorPlane->backGroundColor = currentColor;
 }
 void colorPicker::setColor(const color& newColor)
 {
@@ -43,5 +56,6 @@ void colorPicker::setColor(const color& newColor)
 			channelSliders[channel]->setValue(newColor[channel]);
 		}
 		currentColor = newColor;
+		colorPlane->backGroundColor = currentColor;
 	}
 }

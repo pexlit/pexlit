@@ -1,4 +1,5 @@
 #include "math/rectangle/rectangletn.h"
+#include <math/quaternion/Quaternion.h>
 // #include <immintrin.h> // Include SIMD header for Intel CPUs
 #pragma once
 /// <summary>
@@ -11,6 +12,10 @@ template <typename T, fsize_t rows, fsize_t cols>
 // ordering in memory : 0 0, 0 1, 0 2, 1 0
 //[0] [1] means from x to y
 //[row] [col]
+// x to x, x to y
+// y to x, y to y
+// 1 to x, 1 to y
+//column major, so we can easily create a translation matrix for example
 struct mattnxn : public vectn<vectn<T, cols>, rows>
 {
 	static constexpr fsize_t minimumSize = math::minimum(rows, cols);
@@ -22,6 +27,10 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		{
 			this->axis[i][i] = 1;
 		}
+	}
+	template <typename t2, fsize_t cols2, fsize_t rows2>
+	constexpr mattnxn(const std::array<vectn<t2, cols2>, rows2>& in) : vectn<vectn<T, cols>, rows>(in)
+	{
 	}
 
 	template <typename t2, fsize_t cols2, fsize_t rows2>
@@ -273,6 +282,41 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 						rotate(angle),
 						// then move it back
 						translate(rotateAround) });
+	}
+
+
+	inline static mattnxn rotate(Quaternion rotation)
+		requires (rows == 4 && cols == 4)
+	{
+		rotation.normalize();
+		//https://stackoverflow.com/questions/1556260/convert-quaternion-rotation-to-rotation-matrix
+		return mattnxn<T, rows, cols>(vect4<vec4>
+		{
+			{
+				(fp)1.0 - (fp)2.0 * rotation.y * rotation.y - (fp)2.0 * rotation.z * rotation.z, //x to x
+					(fp)2.0 * rotation.x * rotation.y + (fp)2.0 * rotation.z * rotation.w, //x to y
+					(fp)2.0 * rotation.x * rotation.z - (fp)2.0 * rotation.y * rotation.w, //x to z
+					(fp)0.0//x to w
+			},
+			{
+				(fp)2.0 * rotation.x * rotation.y - (fp)2.0 * rotation.z * rotation.w, //y to x
+				(fp)1.0 - (fp)2.0 * rotation.x * rotation.x - (fp)2.0 * rotation.z * rotation.z, //y to y
+				(fp)2.0 * rotation.y * rotation.z + (fp)2.0 * rotation.x * rotation.w, //y to z
+				(fp)0.0 //y to w
+			},
+			{
+					(fp)2.0 * rotation.x * rotation.z + (fp)2.0 * rotation.y * rotation.w, //z to x
+				(fp)2.0 * rotation.y * rotation.z - (fp)2.0 * rotation.x * rotation.w, //z to y
+				(fp)1.0 - (fp)2.0 * rotation.x * rotation.x - (fp)2.0 * rotation.y * rotation.y, //z to z
+				(fp)0.0//z to w
+			},
+			{
+				(fp)0.0,
+				(fp)0.0,
+				(fp)0.0,
+				(fp)1.0
+			}
+		});
 	}
 
 	inline static mattnxn rotate3d(vect3<T> axis, const T& angle)

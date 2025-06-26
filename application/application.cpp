@@ -227,7 +227,7 @@ application::application(form* mainForm, const std::wstring& name) : INamable(na
 {
 	this->mainForm = mainForm;
 	this->translator = new eventTranslator(*mainForm);
-	listener.hook(&eventTranslator::processEvent, translator);
+	listener.hook(translator, &eventTranslator::processEvent);
 }
 
 application::~application()

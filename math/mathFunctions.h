@@ -16,32 +16,48 @@ namespace math
 	constexpr fp fpepsilon = 0.0001;
 	constexpr fp averageSinusHillValue = 2.0 / PI;
 
-	template<typename T>
-	constexpr T cbrt(const T& x, const T& curr, const T& prev)
+	template <typename T>
+	constexpr T absolute(const T& value)
 	{
-		return curr == prev ? curr : cbrt(x, ((T)2 * curr + x / (curr * curr)) / (T)3, curr);
+		return value < 0 ? -value : value;
+	}
+
+	template <typename T, typename regressionFunctionType>
+	constexpr T rootFunction(const T& input, const regressionFunctionType regressionFunction) {
+		if (input >= (T)0 && std::is_integral_v<T> || input < std::numeric_limits<T>::infinity())
+		{
+			T curr = input, prev = 1;
+			while (math::absolute(curr - prev) > std::numeric_limits<T>::epsilon()) {
+				prev = curr;
+				curr = regressionFunction(input, curr);
+			}
+			return curr;
+		}
+		else
+			return std::numeric_limits<T>::quiet_NaN();
 	}
 
 	template<typename T>
 	constexpr T cbrt(const T& x)
 	{
-		return x >= (T)0 && std::is_integral_v<T> || x < std::numeric_limits<T>::infinity()
-			? cbrt(x, x, (T)0)
-			: std::numeric_limits<T>::quiet_NaN();
+		return std::is_constant_evaluated() ?
+			rootFunction(x, [](const T& x, const T& curr) {
+			return (std::is_integral_v<T> ?
+				//prevent overflow using double division
+				((T)2 * curr + x / curr / curr) :
+				((T)2 * curr + x / (curr * curr))) / (T)3;
+				}) :
+			(T)std::cbrt(x);
 	}
 
-	template <typename T>
-	constexpr T sqrt(const T& x, const T& curr, const T& prev)
-	{
-		return curr == prev ? curr : sqrt(x, (T)0.5 * (curr + x / curr), curr);
-	}
-
-	template <typename T>
+	template<typename T>
 	constexpr T sqrt(const T& x)
 	{
-		return x >= (T)0 && x < std::numeric_limits<T>::infinity()
-			? sqrt(x, x, (T)0)
-			: std::numeric_limits<T>::quiet_NaN();
+		return std::is_constant_evaluated() ?
+			rootFunction(x, [](const T& x, const T& curr) {
+			return (T)0.5 * (curr + x / curr);
+				}) :
+			(T)std::sqrt(x);
 	}
 	constexpr fp sqrt2 = sqrt(2.0);
 
@@ -110,11 +126,7 @@ namespace math
 		return value * value;
 	}
 
-	template <typename T>
-	constexpr T absolute(const T& value)
-	{
-		return value < 0 ? -value : value;
-	}
+
 
 	// https://stackoverflow.com/questions/824118/why-is-floor-so-slow
 	template <typename outputType = int, typename InputType>
@@ -215,12 +227,6 @@ namespace math
 	{
 		return value < min ? min : value > max ? max
 			: value;
-	}
-	template <typename T>
-	constexpr int GetSign(const T& value)
-	{
-		return value > 0 ? 1 : value < 0 ? -1
-			: 0;
 	}
 
 	template <typename T, std::integral PowerType>

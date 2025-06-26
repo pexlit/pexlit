@@ -177,7 +177,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\rectangle\rectangletn.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\SimplexNoise.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sound\sound.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\sphere.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\Sphere.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\sphereCollisions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\tile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\timemath.h" />
@@ -260,6 +260,10 @@
       <Filter>control</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoWriter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\physics\RigidBody.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\physics\gravity\BarnesHutTile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\quaternion\Quaternion.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\PixelOrientation.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="brush">

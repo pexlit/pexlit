@@ -1,3 +1,4 @@
+#pragma once
 #include "array/arraynd/arraynd.h"
 #include <math/graphics/brush/brush.h>
 //modifies the depth buffer!
@@ -19,11 +20,10 @@ struct DepthBufferBrush : public colorBrushSizeT {
 	{
 		cfp& depth = depthBuffer0.getValue(pos);
 		if (depth < depthBuffer1.getValueUnsafe(pos)) {
+			const color c = brush0.getValue(pos);
 			depthBuffer1.setValueUnsafe(pos, depth);
-			return brush0.getValue(pos);
+			return c;
 		}
-		else {
-			return brush1.getValue(pos);
-		}
+		return brush1.getValue(pos);
 	}
 };

@@ -130,7 +130,7 @@ public:
     {
         //typename eventHandlerType::functionType f = std::bind(memberFunction, (mostDerivedType*)this, std::placeholders::_1);
         //handler.eventList.push_back(f);
-        handler.hook(memberFunction, (mostDerivedType*)this);
+        handler.hook((mostDerivedType*)this, memberFunction);
         if constexpr (sizeof...(handlers)){
             addEventHandlers(memberFunction, std::forward<eventHandlerTypes>(handlers)...);
         }

@@ -34,9 +34,6 @@ crectangle2 getBoxContaining(crectangle2& box, cvec2& boxSpeed);
 bool collides2d(cvec2& a0, cvec2& a1, cvec2& b0, cvec2& b1);
 bool collides2d(cvec2& a0, cvec2& a1, cvec2& b0, cvec2& b1, vec2& intersection);
 
-bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, cfp radius, fp& t0, fp& t1);
-bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, const vec3& spherecenter, cfp radius, fp& t0, fp& t1);
-
 
 //https://gamedev.stackexchange.com/questions/48587/resolving-a-collision-with-forces
 template<fsize_t dimensionCount>

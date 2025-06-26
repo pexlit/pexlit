@@ -98,7 +98,10 @@ template<typename T, fsize_t n>
 // alignment is already a power of two
 
 struct
-	alignas(sizeof(T) > 8 ? 0x20 : ((n == 3 || n == 4) && (alignof(T) <= 0x4)) ? (alignof(T) * 0x4) : math::getNextPowerOf2Multiplied(sizeof(T) * n))
+	alignas(
+		sizeof(T) == 1 ? 0 : //for raw byte writing and reading (colors for example)
+		((n == 3 || n == 4) && (alignof(T) <= 0x8)) ? (alignof(T) * 0x4) : //for SIMD
+		0)
 	vectn
 	: public baseVec<T, n>
 {
@@ -260,21 +263,21 @@ struct
 		return result;
 	}
 
-	inline T length() const {
-		return (T)std::sqrt(lengthSquared());
+	constexpr T length() const {
+		return (T)math::sqrt(lengthSquared());
 	}
 
-	inline vectn normalized() const {
+	constexpr vectn normalized() const {
 		vectn result = *this;
 		result.normalize();
 		return result;
 	}
 
-	inline void normalize() {
+	constexpr void normalize() {
 		const auto& squaredLength = lengthSquared();
 		if (squaredLength == 0)return;
 		else {
-			*this /= std::sqrt(squaredLength);
+			*this /= math::sqrt(squaredLength);
 		}
 		//*this *= (T)math::fastInverseSqrt((float)lengthSquared());
 		//
@@ -291,21 +294,23 @@ struct
 		cint& cosa = math::cosDegrees(angle);
 
 		return vectn(
-			this->x * cosa + this->y * sina,
-			this->x * -sina + this->y * cosa);
+			this->x * cosa + this->y * -sina,
+			this->x * sina + this->y * cosa);
 	}
 
-	// 0 -> 0, 1
-	// pi / 2 -> 1,0
-	// pi -> 0, -1
-	// pi * 1.5 -> -1,0
+	// 0 -> 1, 0
+	// pi / 2 -> 0,1
+	// pi -> -1, 0
+	// pi * 1.5 -> 0, -1
 	// rotate vector over z axis
-	inline static vectn getrotatedvector(const fp& yaw) {
+	inline static vectn getrotatedvector(const fp& yaw)
+		requires(axisCount >= 2) {
 		return vectn(sin(yaw), cos(yaw));
 	}
 
 	// rotate vector over z axis, then rotate over rotated x axis
-	inline static vectn getrotatedvector(const T& yaw, const T& pitch) {
+	inline static vectn getrotatedvector(const T& yaw, const T& pitch)
+		requires(axisCount >= 3) {
 		const T& cosp = cos(pitch), sinp = sin(pitch), siny = sin(yaw), cosy = cos(yaw);
 		return vectn(siny * cosp, cosy * cosp, sinp);
 	}
@@ -315,15 +320,7 @@ struct
 	//+y = up
 	// x 0, y 1 : 0
 	inline fp getRotation() const {
-		fp angle = asin(getX());
-		if (getY() < 0) {
-			angle = math::PI - angle;
-		}
-		if (angle < 0) {
-			angle += math::PI2;
-		}
-		// x 0, y 1 : 0
-		return angle;
+		return std::atan2(getY(), getX());
 	}
 
 	constexpr vectn absolute() const {
@@ -419,7 +416,7 @@ struct
 
 #define newMacro(type, copySize) vectn<type COMMA n> result = vectn<type COMMA n>();
 
-	addOperators(newMacro, vectn, wrap(vectn<t2, n>), constexpr,n)
+	addOperators(newMacro, vectn, wrap(vectn<t2, n>), constexpr, n)
 
 #undef newMacro
 		//#pragma optimize ("", off)

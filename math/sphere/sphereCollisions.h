@@ -1,6 +1,9 @@
+#pragma once
 #include "math/sphere/sphere.h"
 //https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection
 //center = vec3(0,0,0)
+//ray direction doesn't have to be normalized!
+//t0 = in, t1 = out
 inline bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, cfp& radius, fp& t0, fp& t1) {
 	cfp& a = raydirection.lengthSquared();
 	cfp& b = 2.0 * vec3::dot(rayorigin, raydirection);
@@ -19,7 +22,7 @@ inline bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, cf
 		return true;
 	}
 }
-inline bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, const sphere& sphere, fp& t0, fp& t1)
+inline bool collideraysphere(const vec3& rayorigin, const vec3& raydirection, const Sphere& sphere, fp& t0, fp& t1)
 {
 	return collideraysphere(rayorigin - sphere.center, raydirection, sphere.radius, t0, t1);
 }
