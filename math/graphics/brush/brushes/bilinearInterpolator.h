@@ -3,7 +3,7 @@
 #include "math/graphics/texture.h"
 #include "math/vector/vectorfunctions.h"
 
-struct bilinearInterpolator final :colorBrush
+struct bilinearInterpolator final :ColorBrush
 {
 	const texture& baseTexture;
 	inline color getValue(cvec2& pos) const

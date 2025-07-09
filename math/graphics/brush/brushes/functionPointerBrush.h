@@ -1,7 +1,7 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
 template <typename colorFunction>
-struct functionPointerBrush final : public colorBrush
+struct functionPointerBrush final : public ColorBrush
 {
 	functionPointerBrush(const colorFunction&& function) :function(function) {}
 	const colorFunction&& function;

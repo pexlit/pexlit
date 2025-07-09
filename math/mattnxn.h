@@ -259,7 +259,7 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 			// first set rotation point to 0,0
 			translate(-rotateAround), });
 	}
-	// clockwise
+	// counterclockwise
 	inline static mattnxn rotate(const T& angle)
 	{
 		const T& sina = sin(angle);
@@ -267,8 +267,8 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 
 		mattnxn result = mattnxn();
 		result[0][0] = cosa;
-		result[1][0] = sina;
-		result[0][1] = -sina;
+		result[1][0] = -sina;
+		result[0][1] = sina;
 		result[1][1] = cosa;
 		return result;
 	}

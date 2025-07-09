@@ -1,7 +1,7 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
 template<ValidBrush brush0Type>
-struct saturator final :public colorBrush
+struct saturator final :public ColorBrush
 {
 	fp addsaturation = 0.3;
 	fp addvalue = 0.1;

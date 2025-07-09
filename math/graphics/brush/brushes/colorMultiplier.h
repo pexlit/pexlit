@@ -21,18 +21,6 @@ struct colorMultiplier final : public combinebrush<brush0Type, brush1Type>
 
 		return combine(original, multiplyWith);
 	}
-	constexpr typename base::ResultingType operator*() const {
-		color color0 = *base::iterator0;
-
-		if (color0.a())
-		{
-			return base::activeBrush.combine(color0, *base::iterator1);
-		}
-		else
-		{
-			return color0;
-		}
-	}
 
 	ColorMultiplierIterator<brush0Type, brush1Type> getIterator(const base::InputType& position) const;
 
@@ -40,12 +28,13 @@ struct colorMultiplier final : public combinebrush<brush0Type, brush1Type>
 template<ValidBrush brush0Type, ValidBrush brush1Type>
 struct ColorMultiplierIterator : public CombineBrushIterator<brush0Type, brush1Type, colorMultiplier<brush0Type, brush1Type>> {
 	typedef CombineBrushIterator<brush0Type, brush1Type, colorMultiplier<brush0Type, brush1Type>> base;
+	using base::base;
 	constexpr typename color operator*() const {
 		color color0 = *base::iterator0;
 
 		if (color0.a())
 		{
-			return base::activeBrush.combine(color0, *base::iterator1);
+			return base::brush.combine(color0, *base::iterator1);
 		}
 		else
 		{
@@ -76,5 +65,5 @@ inline void multiplyRectangle(crectangle2& rect, const color& multiplyColorsWith
 template<ValidBrush brush0Type, ValidBrush brush1Type>
 inline ColorMultiplierIterator< brush0Type, brush1Type> colorMultiplier<brush0Type, brush1Type>::getIterator(const base::InputType& position) const
 {
-	return ColorMultiplierIterator<colorMultiplier>();
+	return ColorMultiplierIterator<brush0Type, brush1Type>(*this, position);
 }

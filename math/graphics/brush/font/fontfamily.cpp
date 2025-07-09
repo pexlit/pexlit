@@ -4,10 +4,10 @@
 #include "math/graphics/brush/transformbrush.h"
 #include "math/rectangle/rectangletn.h"
 
-//truct letterDrawer : public colorBrush
+//truct letterDrawer : public ColorBrush
 //
-//	const colorBrush* bottomBrush = nullptr;
-//	const colorBrush* fontBrush = nullptr;
+//	const ColorBrush* bottomBrush = nullptr;
+//	const ColorBrush* fontBrush = nullptr;
 //	rectangle2 letterRect = vec2();
 //	rectangle2 maskBrushRect = vec2();
 //	virtual inline color getValue(cvec2& pos) const override

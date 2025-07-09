@@ -1,7 +1,7 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
 template<ValidBrush brush0Type>
-struct grayScaleToTransparency final : colorBrush
+struct grayScaleToTransparency final : ColorBrush
 {
 	const brush0Type& grayScaleBrush;
 	inline grayScaleToTransparency(const brush0Type& grayScaleBrush) :grayScaleBrush(grayScaleBrush) {}

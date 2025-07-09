@@ -31,7 +31,8 @@ struct baseRect
 		pos0.~vectn<T, axisCount>();                                                                   \
 		size.~vectn<T, axisCount>();                                                                   \
 	}
-	rectConstructor(axisCount) constexpr baseRect(const T &x, const T &y, const T &w, const T &h) : pos0(vect2<T>(x, y)), size(vect2<T>(w, h))
+	rectConstructor(axisCount)
+		constexpr baseRect(const T& x, const T& y, const T& w, const T& h) : pos0(vect2<T>(x, y)), size(vect2<T>(w, h))
 	{
 	}
 };
@@ -48,8 +49,8 @@ struct baseRect<T, 0>
 		// no need to declare the empty struct, it'd just issue a warning
 	};
 	rectConstructor(0)
-	// constexpr baseRect() = default;
-	// constexpr baseRect() : pos0(vectn<T, axisCount>(), size(vectn<T, axisCount>())) {}
+		// constexpr baseRect() = default;
+		// constexpr baseRect() : pos0(vectn<T, axisCount>(), size(vectn<T, axisCount>())) {}
 };
 template <typename T>
 struct baseRect<T, 1>
@@ -68,8 +69,11 @@ struct baseRect<T, 1>
 		};
 	};
 	rectConstructor(1)
-	// constexpr baseRect() = default;
-	// constexpr baseRect() : pos0(vectn<T, axisCount>(), size(vectn<T, axisCount>())) {}
+		constexpr baseRect(const T& x, const T& w) : pos0(vect1<T>(x)), size(vect1<T>(w))
+	{
+	}
+		// constexpr baseRect() = default;
+		// constexpr baseRect() : pos0(vectn<T, axisCount>(), size(vectn<T, axisCount>())) {}
 };
 
 // #cannot make an union out of this, because the union would need to vary in size depending on the axisCount parameter
@@ -84,8 +88,8 @@ struct rectangletn : baseRect<T, axisCount>
 
 	addMemberName(getX, pos0.getX(), axisCount > 0)
 		addMemberName(getY, pos0.getY(), axisCount > 1)
-			addMemberName(getW, size.getX(), axisCount > 0)
-				addMemberName(getH, size.getY(), axisCount > 1)
+		addMemberName(getW, size.getX(), axisCount > 0)
+		addMemberName(getH, size.getY(), axisCount > 1)
 		//
 		using base::baseRect;
 	constexpr rectangletn() : base(vec(), vec()) {}
@@ -94,18 +98,18 @@ struct rectangletn : baseRect<T, axisCount>
 	//	this->pos0 = pos0;
 	//	this->size = size;
 	// }
-	explicit constexpr rectangletn(cvectn<T, axisCount> &size) : base(vec(), size) {}
+	explicit constexpr rectangletn(cvectn<T, axisCount>& size) : base(vec(), size) {}
 
 	template <typename t2, fsize_t axisCount2>
 	// the input is convertible without loss of data, so make the conversion implicit
 		requires non_narrowing<t2, T>
-	constexpr rectangletn(const rectangletn<t2, axisCount2> &in) : base((vec)in.pos0, (vec)in.size)
+	constexpr rectangletn(const rectangletn<t2, axisCount2>& in) : base((vec)in.pos0, (vec)in.size)
 	{
 	}
 
 	template <typename t2, fsize_t axisCount2>
 		requires narrowing_conversion<t2, T>
-	explicit constexpr rectangletn(const rectangletn<t2, axisCount2> &in) : base((vec)in.pos0, (vec)in.size)
+	explicit constexpr rectangletn(const rectangletn<t2, axisCount2>& in) : base((vec)in.pos0, (vec)in.size)
 	{
 	}
 
@@ -124,7 +128,7 @@ struct rectangletn : baseRect<T, axisCount>
 	{
 		return pos0 + size;
 	}
-	constexpr bool contains(const vec &pos) const
+	constexpr bool contains(const vec& pos) const
 	{
 		for (fsize_t i = 0; i < axisCount; i++)
 		{
@@ -137,16 +141,16 @@ struct rectangletn : baseRect<T, axisCount>
 		return true;
 	}
 
-	constexpr void expand(const T &border)
+	constexpr void expand(const T& border)
 	{
 		pos0 -= border;
 		size += border * 2;
 	}
 
-	constexpr void expandToContain(const rectangletn &rect)
+	constexpr void expandToContain(const rectangletn& rect)
 	{
-		const vec &oldPos11 = pos1();
-		const vec &rectPos11 = rect.pos1();
+		const vec& oldPos11 = pos1();
+		const vec& rectPos11 = rect.pos1();
 		for (fsize_t i = 0; i < axisCount; i++)
 		{
 			if (rect.pos0[i] < pos0[i])
@@ -162,7 +166,7 @@ struct rectangletn : baseRect<T, axisCount>
 	}
 
 	// the rectangle will not exceed the borders; else it will return false.
-	constexpr bool cropClientRect(rectangletn &toCrop) const
+	constexpr bool cropClientRect(rectangletn& toCrop) const
 	{
 		vec toCropPos1 = toCrop.pos1();
 		vec borderPos1 = pos1();
@@ -215,7 +219,7 @@ struct rectangletn : baseRect<T, axisCount>
 		return toCrop;
 	}
 
-	constexpr static T getCollisionArea(rectangletn rect0, const rectangletn &rect1)
+	constexpr static T getCollisionArea(rectangletn rect0, const rectangletn& rect1)
 	{
 		if (rect1.cropClientRect(rect0))
 		{
@@ -227,16 +231,16 @@ struct rectangletn : baseRect<T, axisCount>
 		}
 	}
 
-	constexpr rectangletn expanded(const T &border) const
+	constexpr rectangletn expanded(const T& border) const
 	{
 		rectangletn r = *this;
 		r.expand(border);
 		return r;
 	}
-	constexpr rectangletn touchingBorder(const rectangletn &borders, const directionID &direction) const
+	constexpr rectangletn touchingBorder(const rectangletn& borders, const directionID& direction) const
 	{
 		rectangletn r = *this;
-		caxisID &axis = getAxis(direction);
+		caxisID& axis = getAxis(direction);
 		if (isPositive(direction))
 		{
 			r.pos0[axis] = borders.pos0[axis] + borders.size[axis];
@@ -247,7 +251,7 @@ struct rectangletn : baseRect<T, axisCount>
 		}
 		return r;
 	}
-	constexpr vec rectPos0Centered(const vec &innerRectSize) const
+	constexpr vec rectPos0Centered(const vec& innerRectSize) const
 	{
 		vec result = vec();
 
@@ -257,15 +261,15 @@ struct rectangletn : baseRect<T, axisCount>
 		}
 		return result;
 	}
-	constexpr rectangletn<T, axisCount> rectCentered(const vec &innerRectSize) const
+	constexpr rectangletn<T, axisCount> rectCentered(const vec& innerRectSize) const
 	{
 		return rectangletn<T, axisCount>(rectPos0Centered(innerRectSize), innerRectSize);
 	}
-	constexpr rectangletn<T, axisCount> rectCenteredAround(const vec &newCenterPosition) const
+	constexpr rectangletn<T, axisCount> rectCenteredAround(const vec& newCenterPosition) const
 	{
 		return rectangletn<T, axisCount>(newCenterPosition + (size / (T)2), size);
 	}
-	constexpr void moveToCenter(const rectangletn &outerRect)
+	constexpr void moveToCenter(const rectangletn& outerRect)
 	{
 		pos0 = outerRect.rectPos0Centered(size);
 	}
@@ -278,7 +282,7 @@ struct rectangletn : baseRect<T, axisCount>
 		return pos0 + vec(size) / (T)2;
 	}
 
-	inline static constexpr rectangletn fromOppositeCorners(const vec &corner0, const vec &corner1)
+	inline static constexpr rectangletn fromOppositeCorners(const vec& corner0, const vec& corner1)
 	{
 		vec pos0 = vec();
 		vec pos1 = vec();
@@ -291,7 +295,7 @@ struct rectangletn : baseRect<T, axisCount>
 		return rectangletn(pos0, pos1 - pos0);
 	}
 
-	constexpr T getAlignedY(const T rectangleHeight, const verticalAlignment &alignment)
+	constexpr T getAlignedY(const T rectangleHeight, const verticalAlignment& alignment)
 	{
 		using base::h;
 		using base::y;
@@ -305,7 +309,7 @@ struct rectangletn : baseRect<T, axisCount>
 			return y + h - rectangleHeight;
 		}
 	}
-	constexpr T getAlignedX(const T rectangleWidth, const horizontalAlignment &alignment)
+	constexpr T getAlignedX(const T rectangleWidth, const horizontalAlignment& alignment)
 	{
 		using base::w;
 		using base::x;
@@ -320,11 +324,11 @@ struct rectangletn : baseRect<T, axisCount>
 			return x + w - rectangleWidth;
 		}
 	}
-	constexpr rectangletn rotatedInRectangle(const rectangletn &outerRect, const directionID &direction) const
+	constexpr rectangletn rotatedInRectangle(const rectangletn& outerRect, const directionID& direction) const
 	{
 		rectangletn rotatedRectangle = *this;
 		cbool positive = isPositive(direction);
-		caxisID &axis = getAxis(direction);
+		caxisID& axis = getAxis(direction);
 
 		if (!positive)
 		{
@@ -340,17 +344,17 @@ struct rectangletn : baseRect<T, axisCount>
 
 	inline static constexpr rectangletn unitSquare() { return rectangletn(0, 0, 1, 1); }
 
-	constexpr bool operator==(const rectangletn &other) const
+	constexpr bool operator==(const rectangletn& other) const
 	{
 		return (pos0 == other.pos0) && (size == other.size);
 	}
-	constexpr bool operator!=(const rectangletn &other) const
+	constexpr bool operator!=(const rectangletn& other) const
 	{
 		return !operator==(other);
 	}
 
 	template <typename t2>
-	constexpr rectangletn multiplied(const t2 &multiplier) const
+	constexpr rectangletn multiplied(const t2& multiplier) const
 	{
 		return rectangletn(pos0 * multiplier, size * multiplier);
 	}
@@ -358,12 +362,12 @@ struct rectangletn : baseRect<T, axisCount>
 
 addTemplateTypes(rectangle)
 
-	// An iterator over a vector of vectors.
+// An iterator over a vector of vectors.
 
-	// https://stackoverflow.com/questions/1784573/iterator-for-2d-vector
+// https://stackoverflow.com/questions/1784573/iterator-for-2d-vector
 
-	template <typename T, fsize_t axisCount>
-	struct rectIteratortn
+template <typename T, fsize_t axisCount>
+struct rectIteratortn
 {
 public:
 	vectn<T, axisCount> pos = vectn<T, axisCount>();
@@ -373,10 +377,10 @@ public:
 
 	constexpr rectIteratortn() = default;
 
-	constexpr rectIteratortn(crectangletn<T, axisCount> &rect, cvectn<T, axisCount> &pos) : pos(pos), pos0(rect.pos0), pos1(rect.pos1()) {}
+	constexpr rectIteratortn(crectangletn<T, axisCount>& rect, cvectn<T, axisCount>& pos) : pos(pos), pos0(rect.pos0), pos1(rect.pos1()) {}
 
 	// ++prefix operator
-	constexpr rectIteratortn &operator++()
+	constexpr rectIteratortn& operator++()
 	{
 		for (size_t i = 0; i < axisCount; i++)
 		{
@@ -394,7 +398,7 @@ public:
 		return *this;
 	}
 	// --prefix operator
-	constexpr rectIteratortn &operator--()
+	constexpr rectIteratortn& operator--()
 	{
 		for (size_t i = 0; i < axisCount; i++)
 		{
@@ -424,13 +428,13 @@ public:
 		--(*this);
 		return copy;
 	}
-	constexpr bool operator==(const rectIteratortn &other) const
+	constexpr bool operator==(const rectIteratortn& other) const
 	{
 		return other.pos == pos;
 	}
 	// this operator is used for checking if the end is reached, so it has to be fast
 	// we shouldn'T detect if we're iterating over the same rectangle
-	constexpr bool operator!=(const rectIteratortn &other) const
+	constexpr bool operator!=(const rectIteratortn& other) const
 	{
 		return other.pos != pos;
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
 template<ValidBrush brush0Type>
-struct vignetteBrush final : colorBrush
+struct vignetteBrush final : ColorBrush
 {
 	fp distanceMultiplier = 0;
 	vec2 middle = vec2();
