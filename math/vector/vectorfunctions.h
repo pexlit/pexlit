@@ -134,3 +134,17 @@ inline vec3 makePerpendicular(cvec3& originalDirection, cvec3& planeAxis1, cvec3
 	//when it's the other side, flip
 	return perp * math::sign(vec3::dot(perp, originalDirection));
 }
+namespace std {
+	template<typename T, fsize_t N>
+	struct hash<vectn<T, N>> {
+		size_t operator()(const vectn<T, N>& v) const noexcept {
+			constexpr size_t prime = 92821ULL;
+			size_t result = (size_t)v[0];
+			for (int i = 1; i < N; i++) {
+				result *= prime;
+				result += v[i];
+			}
+			return result;
+		}
+	};
+};

@@ -2,7 +2,7 @@
 #include "array/arraynd/arraynd.h"
 #include <math/graphics/brush/brush.h>
 //modifies the depth buffer!
-template<typename brush0Type, typename depthBrush0Type, typename brush1Type, typename depthBrush1Type>
+template<ValidBrush brush0Type, typename depthBrush0Type, ValidBrush brush1Type, typename depthBrush1Type>
 struct DepthBufferBrush : public colorBrushSizeT {
 	//top brush
 	const brush0Type& brush0;

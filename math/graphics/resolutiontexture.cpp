@@ -64,9 +64,8 @@ const texture& resolutionTexture::mipmap(mat3x3& transform, rectangle2& textureR
 	return tex;
 }
 
-texture resolutionTexture::getHalfResolution(const texture& doubleResolution)
+void resolutionTexture::getHalfResolution(const texture& doubleResolution, const texture& result)
 {
-	texture result(doubleResolution.size / 2);
 
 	//average colors
 	for (fsize_t y = 0; y < result.size.y; y++)
@@ -85,6 +84,12 @@ texture resolutionTexture::getHalfResolution(const texture& doubleResolution)
 			);
 		}
 	}
+}
+
+texture resolutionTexture::getHalfResolution(const texture& doubleResolution)
+{
+	texture result(doubleResolution.size / 2);
+	getHalfResolution(doubleResolution, result);
 	return result;
 }
 

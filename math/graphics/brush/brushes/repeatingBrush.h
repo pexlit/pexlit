@@ -1,15 +1,15 @@
 #pragma once
-#include "math/graphics/brush/brush.h"
-#include "math/graphics/brush/brushes.h"
-template<typename brush0Type, typename resultingType = brush0Type::resultingType, typename InputType = brush0Type::InputType>
-struct repeatingBrush final : public brush<resultingType, InputType>
+#include <math/graphics/brush/brush.h>
+#include <math/graphics/brush/brushes.h>
+template<ValidBrush brush0Type, typename ResultingType = brush0Type::ResultingType, typename InputType = brush0Type::InputType>
+struct repeatingBrush final : public Brush<ResultingType, InputType>
 {
 	//repeats the same brush
 	const brush0Type& brushToRepeat;
 	InputType repeatSize;
 	repeatingBrush(const brush0Type& brushToRepeat, const InputType& repeatSize) :brushToRepeat(brushToRepeat), repeatSize(repeatSize) {}
 	repeatingBrush(const brush0Type& textureToRepeat) :brushToRepeat(textureToRepeat), repeatSize(textureToRepeat.getClientRect().size) {}
-	inline resultingType getValue(const InputType& pos) const
+	inline ResultingType getValue(const InputType& pos) const
 	{
 		if constexpr (std::is_same_v<InputType, vec2>) {
 			const InputType& remainderPos = vec2(math::mod(pos.x, repeatSize.x), math::mod(pos.y, repeatSize.y));
@@ -22,14 +22,14 @@ struct repeatingBrush final : public brush<resultingType, InputType>
 	}
 };
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillRepeatingRectangle(crectangle2& rect, const brush0Type& b, cvec2& repeatSize, const targetType& renderTarget)
 {
 	const auto& repeater = repeatingBrush<brush0Type>(b, repeatSize);
 	fillRectangle(renderTarget, ceilRectangle(rect), repeater);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillRepeatingTexture(crectangle2& rect, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillRepeatingRectangle(rect, tex, tex.size, renderTarget);
@@ -44,7 +44,7 @@ inline void fillRepeatingTexture(crectangle2& rect, const brush0Type& tex, const
 /// <param name="transform"></param>
 /// <param name="tex"></param>
 /// <param name="renderTarget"></param>
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillUnTransformedRepeatingTexture(crectangle2& rect, cmat3x3& transform, const brush0Type& b, cvec2& repeatSize, const targetType& renderTarget)
 {
 	const auto& repeater = repeatingBrush<brush0Type>(b, repeatSize);

@@ -255,7 +255,7 @@ struct
 		return result;
 	}
 
-	constexpr T lengthSquared() const {
+	constexpr T lengthSquared() const noexcept {
 		T result = math::squared(axis[0]);
 		for (fsize_t i = 1; i < axisCount; i++) {
 			result += math::squared(axis[i]);
@@ -319,8 +319,18 @@ struct
 	// clockwise
 	//+y = up
 	// x 0, y 1 : 0
-	inline fp getRotation() const {
-		return std::atan2(getY(), getX());
+	template<fsize_t rotationAxis = 0>
+	inline auto getRotation() const requires(axisCount > rotationAxis) {
+		if constexpr (rotationAxis == 0) {
+			return std::atan2(getY(), getX());
+
+		}
+		else if constexpr(rotationAxis == 1) {
+			return std::asin(getZ());
+		}
+	}
+	inline auto getRotationVector() const requires(axisCount > 2) {
+		return vectn<T, 2>(getRotation(), getRotation<1>());
 	}
 
 	constexpr vectn absolute() const {

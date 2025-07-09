@@ -12,16 +12,16 @@
 #include "math/vector/vectorfunctions.h"
 
 template <typename T, fsize_t n>
-struct arraynd
+struct arraynd : public Brush<T, vect2<fsize_t>>
 {
 	vectn<fsize_t, n> size = vectn<fsize_t, n>();
-	T *baseArray = nullptr;
+	T* baseArray = nullptr;
 
-	constexpr arraynd(cvectn<fsize_t, n> &size, T *const &baseArray) : size(size), baseArray(baseArray) {}
+	constexpr arraynd(cvectn<fsize_t, n>& size, T* const& baseArray) : size(size), baseArray(baseArray) {}
 
-	constexpr arraynd(cvectn<fsize_t, n> &size = cvect2<fsize_t>(), cbool &initializeToDefault = true) : arraynd(size, initializeToDefault ? new T[size.volume()]() : new T[size.volume()]) {}
+	constexpr arraynd(cvectn<fsize_t, n>& size = cvect2<fsize_t>(), cbool& initializeToDefault = true) : arraynd(size, initializeToDefault ? new T[size.volume()]() : new T[size.volume()]) {}
 
-	constexpr arraynd(const std::vector<T> &elements, cvectn<fsize_t, n> &size) : size(size), baseArray(new T[size.volume()])
+	constexpr arraynd(const std::vector<T>& elements, cvectn<fsize_t, n>& size) : size(size), baseArray(new T[size.volume()])
 	{
 		if constexpr (isDebugging)
 		{
@@ -38,8 +38,8 @@ struct arraynd
 	//[y][x]
 	constexpr arraynd(const fastArray<fastArray<T>> elements) : arraynd(cvect2<fsize_t>(elements.size ? elements[0].size : 0, elements.size))
 	{
-		T *ptr = baseArray;
-		for (const fastArray<T> &arr : elements)
+		T* ptr = baseArray;
+		for (const fastArray<T>& arr : elements)
 		{
 			std::copy(arr.begin(), arr.end(), ptr);
 			ptr += size.x;
@@ -55,17 +55,17 @@ struct arraynd
 		}
 	}
 
-	inline T *begin() const
+	inline T* begin() const
 	{
 		return baseArray;
 	}
-	inline T *end() const
+	inline T* end() const
 	{
 		return baseArray + size.volume();
 	}
 
 	// this operator is necessary!!!
-	inline arraynd &operator=(arraynd &&other) noexcept
+	inline arraynd& operator=(arraynd&& other) noexcept
 	{
 		// transfer ownership; other will probably be deleted after this
 		baseArray = other.baseArray;
@@ -76,7 +76,7 @@ struct arraynd
 	};
 
 	// move constructor
-	inline arraynd(arraynd &&other) : size(other.size), baseArray(other.baseArray)
+	inline arraynd(arraynd&& other) : size(other.size), baseArray(other.baseArray)
 	{
 		other.baseArray = nullptr;
 		other.size = veci2();
@@ -89,13 +89,13 @@ struct arraynd
 	// }
 
 	// copy constructor
-	inline arraynd(const arraynd &other) : size(other.size),
-										   baseArray(new T[other.size.volume()])
+	inline arraynd(const arraynd& other) : size(other.size),
+		baseArray(new T[other.size.volume()])
 	{
 		std::copy(other.begin(), other.end(), begin());
 	}
 
-	inline arraynd &operator=(const arraynd &other)
+	inline arraynd& operator=(const arraynd& other)
 	{
 		size = other.size;
 		// we don'T have to check for null pointers
@@ -107,7 +107,7 @@ struct arraynd
 
 	// CAUTION!
 	//[y][x]
-	inline T *operator[](cfsize_t &index) const
+	inline T* operator[](cfsize_t& index) const
 	{
 		if constexpr (isDebugging)
 		{
@@ -125,7 +125,7 @@ struct arraynd
 
 		// in = y
 		// adds the sum of each x row to one element of the output
-		inline fastArray<T> multPointMatrix(const fastArray<T> &in) const
+		inline fastArray<T> multPointMatrix(const fastArray<T>& in) const
 	{
 		fastArray<T> result = fastArray<T>(size.x);
 		for (fsize_t toIndex = 0; toIndex < result.size; toIndex++)
@@ -150,13 +150,13 @@ struct arraynd
 	}
 
 	// does not write size to stream!
-	inline void serialize(const streamSerializer &s) const
+	inline void serialize(const streamSerializer& s) const
 	{
 		s.serialize(baseArray, size.volume());
 	}
 
 	template <typename axisType>
-	constexpr bool inBounds(cvectn<axisType, n> &pos) const
+	constexpr bool inBounds(cvectn<axisType, n>& pos) const
 	{
 		for (fsize_t i = 0; i < n; i++)
 		{
@@ -167,7 +167,7 @@ struct arraynd
 		}
 		return true;
 	}
-	constexpr bool inBounds(crectanglein<n> &rect) const
+	constexpr bool inBounds(crectanglein<n>& rect) const
 	{
 		cveci2 pos11 = rect.pos1();
 
@@ -181,13 +181,13 @@ struct arraynd
 		return true;
 	}
 
-	inline constexpr void fill(const T &value) const
+	inline constexpr void fill(const T& value) const
 	{
 		std::fill(baseArray, baseArray + size.volume(), value);
 	}
 
 	template <typename indexType>
-	inline T &getValueReferenceUnsafe(cvectn<indexType, n> &pos) const
+	inline T& getValueReferenceUnsafe(cvectn<indexType, n>& pos) const
 	{
 		if constexpr (isDebugging)
 		{
@@ -206,25 +206,25 @@ struct arraynd
 	}
 
 	template <typename indexType>
-	inline T getValueUnsafe(cvectn<indexType, n> &pos) const
+	inline T getValueUnsafe(cvectn<indexType, n>& pos) const
 	{
 		return getValueReferenceUnsafe(pos);
 	}
 
 	template <typename indexType>
-	inline T getValue(cvectn<indexType, n> &pos) const
+	inline T getValue(cvectn<indexType, n>& pos) const
 	{
 		return inBounds(pos) ? getValueUnsafe(pos) : T();
 	}
 
 	template <typename indexType>
-	inline void setValueUnsafe(cvectn<indexType, n> &pos, const T &value) const
+	inline void setValueUnsafe(cvectn<indexType, n>& pos, const T& value) const
 	{
 		getValueReferenceUnsafe(pos) = value;
 	}
 
 	template <typename indexType>
-	inline void setValue(cvectn<indexType, n> &pos, const T &value) const
+	inline void setValue(cvectn<indexType, n>& pos, const T& value) const
 	{
 		if (inBounds(pos))
 		{
@@ -232,7 +232,7 @@ struct arraynd
 		}
 	}
 
-	inline T getValueClampedToEdgePositive(cvectn<fsize_t, n> &pos) const
+	inline T getValueClampedToEdgePositive(cvectn<fsize_t, n>& pos) const
 	{
 		vectn<fsize_t, n> clamped = cvectn<fsize_t, n>();
 
@@ -244,7 +244,7 @@ struct arraynd
 		return getValueUnsafe(clamped);
 	}
 
-	inline T getValueClampedToEdge(cvecin<n> &pos) const
+	inline T getValueClampedToEdge(cvecin<n>& pos) const
 	{
 		cvecin<n> clamped = cvecin<n>();
 		for (auto axisIt : std::views::zip(clamped, pos))
@@ -253,6 +253,21 @@ struct arraynd
 		}
 
 		return getValueClampedToEdgePositive(cvectn<fsize_t, n>(clamped));
+	}
+	struct Iterator {
+		T* ptr;
+		constexpr Iterator(const arraynd& array, cvect2<fsize_t>& pos) noexcept {
+			ptr = &array.getValueReferenceUnsafe(pos);
+		}
+		constexpr void operator++() noexcept {
+			ptr++;
+		}
+		T operator *() const {
+			return *ptr;
+		}
+	};
+	constexpr Iterator getIterator(cvect2<fsize_t>& pos) const {
+		return Iterator(*this, pos);
 	}
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "math/graphics/brush/brushes/solidBrush.h"
 #include "math/graphics/color/color.h"
-typedef solidBrush<color, vec2> solidColorBrush;
+typedef solidBrush<color> solidColorBrush;
 namespace brushes
 {
 	extern solidColorBrush black;

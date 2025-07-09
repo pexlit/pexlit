@@ -574,7 +574,7 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		);
 	}
 
-	// will bring z to the range [0,1] with 0 being zNear and 1 being zFar
+	// will bring z to the range [0,1] with 0 being zFar and 1 being zNear (so higher than 1 should be clipped)
 	// will bring x and y in the range [-1, 1]
 	// glm method
 	//fovY: fov of the screens y axis in radians

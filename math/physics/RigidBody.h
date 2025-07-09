@@ -2,12 +2,19 @@
 #include <math/vector/vectn.h>
 #include <math/vector/vectorfunctions.h>
 #include <math/quaternion/Quaternion.h>
+enum ForceMode {
+	VelocityChange,//apply as velocity directly
+	Impulse,//divide by weight
+	Acceleration,//multiply by timestep
+	Force//divide by weight, multiply by timestep
+};
 struct RigidBody {
 	vec3 centerOfMass;
 	fp mass;
 	vec3 velocity;
 	Quaternion angularVelocity = Quaternion::identity();
 	Quaternion rotation{};
+	vec3 acceleration{};
 	RigidBody() : centerOfMass{}, mass{} {}
 	RigidBody(cvec3& centerOfMass, cfp& mass, cvec3& velocity = {}, Quaternion rotation = Quaternion::identity()) : centerOfMass(centerOfMass), mass(mass), velocity(velocity), rotation(rotation) {
 
@@ -31,5 +38,18 @@ struct RigidBody {
 		}
 		cvec3& acceleration = (velocityPart / mass) * directionToCenter;
 		velocity += acceleration;
+	}
+	template<ForceMode mode>
+	void applyForce(vec3 force) {
+		if constexpr (mode & 0b1) {
+			//divide by mass
+			force /= mass;
+		}
+		if constexpr (mode & 0b10) {
+			//multiply by timestep
+			acceleration += force;
+		}
+		else
+			velocity += force;
 	}
 };

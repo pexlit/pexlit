@@ -1,6 +1,6 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
-template<typename brush0Type, typename brush1Type>
+template<ValidBrush brush0Type, ValidBrush brush1Type>
 struct alphaMask final :public combinebrush<brush0Type, brush1Type>
 {
 	//alpha will be sampled from this brush

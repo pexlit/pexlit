@@ -29,7 +29,7 @@ public:
 	void DrawLetter(cletter& l, cmat3x3& transformFrom1x1, const texture& renderTarget) const;
 	//template <typename textBrush>
 	//void DrawLetter(cletter& l, cvec2& position, cfp& letterSize, const std::optional<mat3x3>& matrix, const texture& renderTarget, const textBrush& b) const;
-	template<typename textBrush, typename = std::enable_if_t<is_brush_v<textBrush>>>
+	template<ValidBrush textBrush>
 	inline void DrawLetter(cletter& l, cvec2& position, cfp& letterSize, const texture& renderTarget, const textBrush& b, const std::optional<mat3x3>& matrix = std::nullopt) const
 	{
 		cmat3x3& transform = mat3x3::fromRectToRect(crectangle2(0, 0, 1, 1), crectangle2(position, cvec2(letterSize)));
@@ -40,7 +40,7 @@ public:
 			DrawLetter(l, transform, renderTarget, b);
 	}
 	//transform: from 
-	template<typename textBrush>
+	template<ValidBrush textBrush>
 	inline void DrawLetter(cletter& l, cmat3x3& transformFrom1x1, const texture& renderTarget, const textBrush& b) const
 	{
 		//cint& letterIndex = l & 0xff;

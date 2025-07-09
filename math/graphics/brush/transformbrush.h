@@ -11,13 +11,13 @@ constexpr mat3x3 brushFixTransform = mat3x3();//mat3x3::translate(cvec2(brushFix
 //	mat3x3::scale(cvec2(0xffffff / (fp)0x1000000)) //scales a bit so the last pixels don'T get out of bounds
 //);
 //transforms a point (after offsetting it a bit for rotation) and then calls a base brush
-template<typename brush0Type>
-struct transformBrush final : public colorBrush
+template<ValidBrush brush0Type>
+struct transformBrush final : public ColorBrush
 {
-//private:
-	//transform: from screen pixel (or other transform) to texture pixel
+	//private:
+		//transform: from screen pixel (or other transform) to texture pixel
 	mat3x3 modifiedTransform;//cannot access the transform, as it is modified
-//public:
+	//public:
 	const brush0Type& baseBrush;
 	transformBrush(const mat3x3& transform, const brush0Type& baseBrush) :
 		modifiedTransform(mat3x3::cross(brushFixTransform, transform)),//transformed pixel -> scale (make smaller), translate
@@ -57,4 +57,26 @@ struct transformBrush final : public colorBrush
 		//return baseBrush.getValue(baseBrushPos);
 		return baseBrush.getValue((typename brush0Type::InputType)modifiedTransform.multPointMatrix(pos));
 	}
+	struct Iterator : public RowIterator<transformBrush<brush0Type>> {
+		typedef transformBrush<brush0Type> brushType;
+		typedef RowIterator<brushType> base;
+		const vec2 step;
+		constexpr Iterator(const brushType& brush, cvec2& position) :
+			base(brush, brush.modifiedTransform.multPointMatrix(position)),
+			step(brush.modifiedTransform.getStep(axisID::x))
+		{
+		}
+		//for when anything needs to be incremented without getting value
+		constexpr Iterator& operator++() {
+			base::position += step;
+			return *this;
+		}
+		constexpr typename brush0Type::ResultingType operator*() const {
+			return base::brush.baseBrush.getValue((typename brush0Type::InputType)base::position);
+		}
+	};
+	constexpr Iterator getIterator(cvec2& pos) const {
+		return Iterator(*this, pos);
+	}
 };
+

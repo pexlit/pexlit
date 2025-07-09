@@ -16,6 +16,8 @@ struct videoWriter {
 	stdPath outputFilePath;
 	FILE* pipe;
 	videoWriter(cveci2& size, cfp& fps, const stdPath outputFilePath) :size(size), fps(fps), outputFilePath(outputFilePath) {
+		if (size.x & 1 || size.y & 1)
+			throw "size not divisable by 2";
 		std::string command = std::format("ffmpeg -f rawvideo -pix_fmt rgb24 -video_size {}x{} -r {} -i - -vcodec libx264 -qp 18 -x264opts opencl -pix_fmt yuv420p -r 60 \"{}\"",
 			size.x, size.y, fps,
 			outputFilePath.string()

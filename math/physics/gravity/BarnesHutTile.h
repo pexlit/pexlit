@@ -1,71 +1,99 @@
+#pragma once
 #include <math/rectangle/rectangletn.h>
 #include <math/physics/gravity/gravity.h>
 #include <math/physics/RigidBody.h>
+#include <deque>
+#include <math/Square.h>
+//a deque is an array which can resize without moving or calling constructors on previous objects
+extern std::deque<struct BarnesHutTile> storage;
+int storageIndex = 0;
+constexpr fp smallestTileSize = 1;
 /// <summary>
 /// this gravity simulator makes use of the barnes-hut gravity algorithm
 /// http://arborjs.org/docs/barnes-hut
 /// </summary>
 struct BarnesHutTile
 {
-	vec3 centerOfMass;
-	fp mass;
-	static constexpr fp gravitationalConstant = 0.00005;
-	static constexpr fp theta = 0.5;
+	//we store the body, as it's also used in collision detection
+	std::vector<const RigidBody*> bodies;
+	vec3 centerOfMass{};
+	fp mass{};
+	static constexpr fp theta = 1;
 	BarnesHutTile* children[8]{};
-	crectangle3 bounds;
+	std::vector<BarnesHutTile*> occupiedChildren{};
+	Square3 bounds;
 	int bodyCount = 0;
-	inline BarnesHutTile(crectangle3& bounds = rectangle3()) :bounds(bounds)
+	inline BarnesHutTile(cSquare3& bounds = Square3()) :bounds(bounds)
 	{
 	}
+	constexpr int getChildIndex(const RigidBody* body) const {
+		int childIndex = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			childIndex |= (body->centerOfMass[i] > bounds.center[i]) << i;
+		}
+		return childIndex;
+	}
 	//accept any type, as long as it has a centerOfMass and a mass. this makes it work for both BarnesHutTiles and RigidBodies
-	template<typename bodyType>
-	inline void AddQuadrant(bodyType* body)
+	inline void AddQuadrant(const RigidBody* body)
 	{
-		vec3 relative = body->centerOfMass - bounds.getCenter();
-		int index = 0;
+		int index = getChildIndex(body);
 
-		vec3 childNodeSize = bounds.size * 0.5f;
-		vec3 childNodePos = bounds.pos0;
+		cfp& childNodeSize = bounds.radius * 0.5;
+		Square3 childNodeBounds = cSquare3(bounds.center - childNodeSize, childNodeSize);
 
 		for (int i = 0; i < 3; i++)
 		{
-			if (relative[i] > 0)
-			{
-				childNodePos[i] += childNodeSize[i];
-				index += 1 << i;
-			}
+			childNodeBounds.center[i] += bounds.radius * (index >> i & 1);
 		}
 
-		if (children[index] == nullptr)
+		BarnesHutTile* child = children[index];
+		if (child == nullptr)
 		{
-			children[index] = new BarnesHutTile(rectangle3(childNodePos, childNodeSize));
+			if (storageIndex >= storage.size()) {
+				//if storage would be a vector, this'd corrupt the 'this' pointer because it's modifying the vector in which it lives itself
+				storage.push_back(BarnesHutTile());
+			}
+			child = &storage[storageIndex];
+			children[index] = child;
+			occupiedChildren.push_back(child);
+			child->reset(childNodeBounds);
+			storageIndex++;
 		}
-		children[index]->AddBodyUnsafe(body);
+		child->AddBodyUnsafe(body);
 
 	}
-	inline void AddBody(RigidBody* body) {
-		if (bounds.contains(body->centerOfMass))
+	inline bool inBounds(cvec3& pos) const {
+		for (int i = 0; i < 3; i++) {
+			if (std::abs(pos[i] - centerOfMass[i]) > bounds.radius)return false;
+		}
+		return true;
+	}
+	inline void AddBody(const RigidBody* body) {
+		if (inBounds(body->centerOfMass))
 			AddBodyUnsafe(body);
 	}
-	template<typename BodyType>
-	inline void AddBodyUnsafe(BodyType* body)
+	inline void AddBodyUnsafe(const RigidBody* body)
 	{
 		bodyCount++;
 		if (bodyCount > 1)
 		{
-			if (bodyCount == 2)
+			if (this->bodies.size())
 			{
-				if (this->centerOfMass == body->centerOfMass)
+				if (bounds.radius < smallestTileSize || this->bodies[0]->centerOfMass == body->centerOfMass)
 				{
-					//simply dont add the molecule. the mass has been added.
+					this->bodies.push_back(body);
+					//simply dont add the molecule. when we would add it, we would endlessly create child tiles trying to separate the bodies.
 					return;
 				}
 				else
 				{
-					//separate both molecules into different quadrants
-					AddQuadrant(this);
-					this->centerOfMass = vec3();
-					this->mass = 0;
+					for (const RigidBody* const& existingBody : bodies) {
+						//separate both molecules into different quadrants
+						AddQuadrant(existingBody);
+						this->bodies.clear();
+
+					}
 				}
 			}
 			AddQuadrant(body);
@@ -73,47 +101,49 @@ struct BarnesHutTile
 		}
 		else
 		{
-			this->centerOfMass = body->centerOfMass;
-			this->mass = body->mass;
+			this->bodies = { body };
 		}
 	}
 	inline void CalculateMassDistribution()
 	{
-		if (bodyCount > 1)
-		{
-			for (int i = 0; i < 0x8; i++)
-			{
-				if (children[i] != nullptr)
-				{
-					children[i]->CalculateMassDistribution();
-					mass += children[i]->mass;
-					centerOfMass += children[i]->mass * children[i]->centerOfMass;
-				}
+		if (this->bodies.size()) {
+			for (const RigidBody* body : this->bodies) {
+				this->mass += body->mass;
+				this->centerOfMass = body->centerOfMass * body->mass;
 			}
-			centerOfMass /= mass;
 		}
+		else
+			for (BarnesHutTile* child : occupiedChildren) {
+				child->CalculateMassDistribution();
+				mass += child->mass;
+				centerOfMass += child->mass * child->centerOfMass;
+			}
+		centerOfMass /= mass;
 	}
-	inline vec3 CalculateForce(vec3 targetPos)
+	inline vec3 CalculateForce(cvec3& targetPos, cfp& gravitationalConstant) const
 	{
-		constexpr fp radius = 1;
-		if (bodyCount == 1 ||
+		constexpr fp softenRadius = 1;
+		if (
 			//s / r < t
 			//square everything
 			//(s * s) / (r * r) < (t * t)
-			math::squared(bounds.size.x) / (centerOfMass - targetPos).lengthSquared() < math::squared(theta)
+			math::squared(bounds.radius * 2) / (centerOfMass - targetPos).lengthSquared() < math::squared(theta)
 			)
 		{
-			return calculateAcceleration(targetPos, centerOfMass, mass, gravitationalConstant, radius);
+			return calculateAcceleration(targetPos, centerOfMass, mass, gravitationalConstant, softenRadius);
+		}
+		else if (bodies.size()) {
+			vec3 totalForce{};
+			for (const RigidBody* body : bodies) {
+				totalForce += calculateAcceleration(targetPos, body->centerOfMass, body->mass, gravitationalConstant, softenRadius);
+			}
+			return totalForce;
 		}
 		else
 		{
 			vec3 totalForce{};
-			for (int i = 0; i < 0x8; i++)
-			{
-				if (children[i] != nullptr)
-				{
-					totalForce += children[i]->CalculateForce(targetPos);
-				}
+			for (const BarnesHutTile* child : occupiedChildren) {
+				totalForce += child->CalculateForce(targetPos, gravitationalConstant);
 			}
 			return totalForce;
 		}
@@ -138,17 +168,28 @@ struct BarnesHutTile
 	//	//return difference * ((m1 * gravityConstant) / (distanceSquared * std::sqrt(distanceSquared)));
 	//}
 	inline ~BarnesHutTile() {
-		for (BarnesHutTile* child : children) {
-			delete child;
-		}
+		//for (BarnesHutTile* child : children) {
+		//	delete child;
+		//}
 	}
-	inline void clear() {
-		for (BarnesHutTile*& child : children) {
-			delete child;
-			child = nullptr;
-		}
+	inline void reset() {
+		reset(bounds);
+		storage.resize(0x1000);
+		storageIndex = 0;
+	}
+	inline void reset(cSquare3& newBounds) {
+		//for (BarnesHutTile*& child : children) {
+		//	delete child;
+		//	child = nullptr;
+		//}
+		bodies.clear();
 		bodyCount = 0;
 		centerOfMass = vec3();
 		mass = 0;
+		bounds = newBounds;
+		std::fill(std::begin(children), std::end(children), nullptr);
+		occupiedChildren.clear();
 	}
 };
+//initialize
+std::deque<BarnesHutTile> storage{};

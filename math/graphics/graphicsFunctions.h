@@ -7,7 +7,7 @@
 #include <math/graphics/PixelOrientation.h>
 
 // the rect should be relative to the default size.
-template <typename brush0Type>
+template <ValidBrush brush0Type>
 inline void fillRectangle(const resolutionTexture& tex, rectangle2 rect, const brush0Type& b)
 {
 	cfp& scaleModifier = tex.getScaleModifier();
@@ -27,7 +27,7 @@ inline void fillRectangle(const resolutionTexture& tex, rectangle2 rect, const b
 }
 
 // the rect should be relative to the default size.
-template <typename brush0Type>
+template <ValidBrush brush0Type>
 inline void fillTransformedRectangle(const resolutionTexture& tex, crectangle2& brushRect, mat3x3 transform, const brush0Type& b)
 {
 	cfp& scaleModifier = tex.getScaleModifier();
@@ -45,7 +45,7 @@ inline void fillTransformedRectangle(const resolutionTexture& tex, crectangle2& 
 	tex.recalculateScaledTextures();
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillRectangleUnsafe(const array2d<T>& array, crectanglet2<fsize_t>& rect, const brush0Type& b)
 {
 	cvect2<fsize_t>& pos11 = rect.pos1();
@@ -55,7 +55,7 @@ inline void fillRectangleUnsafe(const array2d<T>& array, crectanglet2<fsize_t>& 
 	}
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillRectangle(const array2d<T>& array, rectanglei2 rect, const brush0Type& b)
 {
 	if (array.getClientRect().cropClientRect(rect))
@@ -64,13 +64,13 @@ inline void fillRectangle(const array2d<T>& array, rectanglei2 rect, const brush
 	}
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillRectangle(const array2d<T>& array, crectangle2& rect, const brush0Type& b)
 {
 	fillRectangle(array, ceilRectangle(rect), b);
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillRectangleBorders(const array2d<T>& array, crectanglei2& rect, cint& borderThickness, const brush0Type& b)
 {
 	fillRectangle(array, crectanglei2(rect.x, rect.y, rect.size.x, borderThickness), b);
@@ -79,13 +79,13 @@ inline void fillRectangleBorders(const array2d<T>& array, crectanglei2& rect, ci
 	fillRectangle(array, crectanglei2(rect.x + rect.size.x - borderThickness, rect.y, borderThickness, rect.size.y), b);
 }
 // expands inward
-template <typename T, fsize_t n, typename brush0Type>
+template <typename T, fsize_t n, ValidBrush brush0Type>
 inline void fillRectangleBorders(const array2d<T>& array, cveci2& pos00, cveci2& pos11, cint& borderThickness, const brush0Type& b)
 {
 	fillRectangleBorders(array, crectanglei2(pos00, pos11 - pos00 + 1), borderThickness, b);
 }
 
-template<typename T, typename brush0Type>
+template<typename T, ValidBrush brush0Type>
 //the camera rotation transform transforms from default axes:
 //forward: 010
 //right: 100
@@ -131,6 +131,12 @@ inline void fillTransformedSphere(const array2d<T>& array, const Sphere& sphere,
 		cvec3& sphereCenterSquared = math::squared(transformedSpherePosition);
 
 		cfp& sphereDistanceSquared = sphereCenterSquared.sum() - radiusSquared;
+		if (sphereDistanceSquared < 0) {
+			//the camera is inside the sphere
+			//just fill all rows with the brush
+			fillRectangle(array, array.getClientRect(), brush);
+			return;
+		}
 		cfp& planeZ = 1;
 		cfp& planeZSquared = planeZ * planeZ;
 
@@ -178,24 +184,25 @@ inline void fillTransformedSphere(const array2d<T>& array, const Sphere& sphere,
 	}
 
 }
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillTransformedLine(cvec3& p0, cvec3& p1, const mat4x4& transform, const array2d<T>& array, const brush0Type& brush) {
 	vec4 perspectiveP0 = transform.multPointMatrix<4>(p0);
 	perspectiveP0 /= perspectiveP0.w;
 	vec4 perspectiveP1 = transform.multPointMatrix<4>(p1);
 	perspectiveP1 /= perspectiveP1.w;
-	constexpr fp nearPlane = -1;
+	//https://learnopengl.com/Advanced-OpenGL/Depth-testing
+	constexpr fp nearPlane = 1;
 	vec2 screenP0 = vec2(perspectiveP0), screenP1 = vec2(perspectiveP1);
 	//clip
-	if (perspectiveP0.z < nearPlane) {
-		if (perspectiveP1.z < nearPlane) {
+	if (perspectiveP0.z > nearPlane) {
+		if (perspectiveP1.z > nearPlane) {
 			return;
 		}
 		else {
 			screenP0 = math::lerp(screenP1, screenP0, (perspectiveP1.z - nearPlane) / (perspectiveP1.z - perspectiveP0.z));
 		}
 	}
-	else if (perspectiveP1.z < nearPlane) {
+	else if (perspectiveP1.z > nearPlane) {
 		screenP1 = math::lerp(screenP0, screenP1, (perspectiveP0.z - nearPlane) / (perspectiveP0.z - perspectiveP1.z));
 	}
 	fillLine(array, screenP0, screenP1, brush);
@@ -218,7 +225,7 @@ inline void renderAxes(const mat4x4& transform, const texture& renderTarget) {
 }
 // x, y: pos00 position
 // w, h: width, height
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillEllipse(const array2d<T>& array, crectangle2& rect, const brush0Type& b)
 {
 	rectanglei2 croppedRect = ceilRectangle(rect);
@@ -267,7 +274,7 @@ inline void fillEllipse(const array2d<T>& array, crectangle2& rect, const brush0
 	}
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillEllipseCentered(const array2d<T>& array, crectangle2& rect, const brush0Type& b)
 {
 	fillEllipse(array, crectangle2(rect.pos0 - rect.size * 0.5, rect.size), b);
@@ -279,13 +286,13 @@ inline void fillEllipseCentered(const array2d<T>& array, crectangle2& rect, cons
 // also worth checking out:
 // https://www.redblobgames.com/grids/line-drawing.html
 // https://www.geeksforgeeks.org/bresenhams-line-generation-algorithm/
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillLine(const array2d<T>& array, cvec2& p0, cvec2& p1, const brush0Type& b)
 {
 	fillLineUnsafeCropped(array, p0, p1, b, array.getClientRect());
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillLineUnsafeCropped(const array2d<T>& array, vec2 p0, vec2 p1, const brush0Type& b, crectangle2& cropRect) {
 	if (cropLine(p0, p1, crectangle2(cropRect.pos0, vec2(cropRect.size - 1))))
 	{
@@ -293,7 +300,7 @@ inline void fillLineUnsafeCropped(const array2d<T>& array, vec2 p0, vec2 p1, con
 	}
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillLineUnsafe(const array2d<T>& array, cvec2& p0, cvec2& p1, const brush0Type& b)
 {
 	veci2 currentPosition = veci2((int)p0.x, (int)p0.y);
@@ -333,7 +340,7 @@ inline constexpr int getEndY(cfp& maxY, const array2d<T>& array)
 }
 
 // this function fills a line expanded by a certain radius.
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillLine(const array2d<T>& array, cvec2& p0, cvec2& p1, cfp& radius, const brush0Type& b)
 {
 	cfp& radiusSquared = radius * radius;
@@ -403,7 +410,7 @@ inline void fillLine(const array2d<T>& array, cvec2& p0, cvec2& p1, cfp& radius,
 
 // shifted so the first point is the lowest point
 // clockwise!
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillPolygonShiftedUnsafe(const array2d<T>& array, const fastArray<vec2>& shiftedPositions, cfp& minY, cfp& maxY, const brush0Type& b)
 {
 	// 0 = left, 1 = right
@@ -456,7 +463,7 @@ inline void fillPolygonShiftedUnsafe(const array2d<T>& array, const fastArray<ve
 }
 
 // positions can'T overlap each other in the x axis
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillPolygon(const array2d<T>& array, const fastArray<vec2>& positions, const brush0Type& b)
 {
 	// find highest y pos
@@ -503,7 +510,7 @@ inline void fillPolygon(const array2d<T>& array, const fastArray<vec2>& position
 	}
 }
 
-template <typename T, typename brush0Type>
+template <typename T, ValidBrush brush0Type>
 inline void fillTransformedRectangle(const array2d<T>& array, rectangle2 brushRect, cmat3x3& transform, const brush0Type& b)
 {
 	if (transform.isStraight()) // simple check which can save a lot of time

@@ -2,8 +2,7 @@
 #include "brush/brush.h"
 #include "array/arraynd/arraynd.h"
 #include "math/graphics/color/colorPalette.h"
-
-struct texture : public colorBrushSizeT, public array2d<colortn<colorChannel, bgraColorChannelCount>>
+struct texture : public array2d<colortn<colorChannel, bgraColorChannelCount>>
 {
 public:
 	typedef array2d<colortn<colorChannel, bgraColorChannelCount>> base;
@@ -15,6 +14,7 @@ public:
 	void switchChannels(colorb *byteArray, cint &channelIndex1, cint &channelIndex2) const;
 	void Flip() const;
 	bool Save(const stdPath &path) const;
+
 
 	inline color getValue(cvect2<fsize_t> &pos) const
 	{

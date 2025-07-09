@@ -1,6 +1,6 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
-template <typename brush0Type, typename brush1Type>
+template <ValidBrush brush0Type, ValidBrush brush1Type>
 struct colorMaximizer final : public colorBrush
 {
 	typedef std::conditional_t<std::is_same_v<typename brush0Type::InputType, typename brush1Type::InputType>, typename brush0Type::InputType, colorBrush::InputType> InputType;

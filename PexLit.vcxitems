@@ -148,6 +148,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sound\sound.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\Sphere.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\sphere\sphereCollisions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\Square.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\tile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\timemath.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\treenodeiterator.h" />

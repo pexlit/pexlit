@@ -3,8 +3,8 @@
 #include "math/algorithm/modInverse.h"
 #include <bitset>
 
-template <typename T>
-struct shuffleRandom
+template <typename T = unsigned int>
+struct ShuffleRandom
 {
 	static constexpr size_t bitCount = sizeof(T) * 0x8;
 	typedef long long signedBiggerType;
@@ -54,7 +54,6 @@ struct shuffleRandom
 		in *= reverseP0;
 		return in;
 	}
-	shuffleRandom(const T &seed) : seed(seed) {}
-};
 
-typedef shuffleRandom<unsigned int> uintShuffleRandom;
+	ShuffleRandom(const T& seed) : seed(seed) {}
+};

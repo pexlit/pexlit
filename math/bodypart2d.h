@@ -44,7 +44,7 @@ struct bodyPart2D : IDestructable
 	vec2 getRotationCenterPosition() const;
 	virtual ~bodyPart2D() override;
 
-	template<typename brush0Type>
+	template<ValidBrush brush0Type>
 	inline void renderRecursive(const texture& renderTarget, mat3x3 transform, const brush0Type& b)
 	{
 		if (changed)

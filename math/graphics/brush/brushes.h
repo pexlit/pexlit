@@ -33,7 +33,7 @@
 //	}
 //};
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedBrushRectangle(crectangle2& brushRect, cmat3x3& transform, const brush0Type& b, const targetType& renderTarget)
 {
 	//+0.5, * transform, -0.5
@@ -59,7 +59,7 @@ inline void fillTransformedBrushRectangle(rectangle2 brushRect, mat3x3 transform
 	fillTransformedBrushRectangle(brushRect, transform, tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentRectangle(crectangle2& brushRect, cmat3x3& transform, const brush0Type& b, const targetType& renderTarget)
 {
 	const auto& matrixBrush = transformBrush<brush0Type>(transform.inverse(), b);
@@ -76,13 +76,13 @@ inline void fillTransparentRectangle(rectangle2 brushRect, mat3x3 transform, con
 
 
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedBrushRectangle(crectangle2& brushRect, cvec2& drawOffset, const brush0Type& b, const targetType& renderTarget)
 {
 	fillTransformedBrushRectangle(brushRect, crectangle2(drawOffset, brushRect.size), b, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedBrushRectangle(crectangle2& brushRect, crectangle2& rectangleToTransform, cmat3x3& transform, const brush0Type& b, const targetType& renderTarget)
 {
 	//from brush rect to rectangleToTransform to transformed rectangle
@@ -90,67 +90,67 @@ inline void fillTransformedBrushRectangle(crectangle2& brushRect, crectangle2& r
 }
 
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedBrushRectangle(crectangle2& brushRect, crectangle2& drawRect, const brush0Type& b, const targetType& renderTarget)
 {
 	fillTransformedBrushRectangle(brushRect, mat3x3::fromRectToRect(brushRect, drawRect), b, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedTexture(mat3x3 transform, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransformedBrushRectangle(crectangle2(tex.getClientRect()), transform, tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedTexture(crectangle2& rect, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransformedBrushRectangle(crectangle2(tex.getClientRect()), rect, tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedTexture(cvec2& pos, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransformedBrushRectangle(crectangle2(tex.getClientRect()), mat3x3::translate(pos), tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline void fillTransformedTexture(const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransformedBrushRectangle(crectangle2(tex.getClientRect()), mat3x3(), tex, renderTarget);
 }
 
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentRectangle(crectangle2& brushRect, crectangle2& drawRect, const brush0Type& b, const targetType& renderTarget)
 {
 	fillTransparentRectangle(brushRect, mat3x3::fromRectToRect(brushRect, drawRect), b, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentTexture(crectangle2& drawRect, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransparentRectangle(crectangle2(tex.getClientRect()), drawRect, tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentTexture(cmat3x3& transform, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransparentRectangle(crectangle2(tex.getClientRect()), transform, tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentTexture(crectangle2& textureRect, cvec2& drawPosition, const brush0Type& tex, const targetType& renderTarget)
 {
 	fillTransparentRectangle(crectangle2(textureRect), crectangle2(drawPosition, textureRect.size), tex, renderTarget);
 }
 
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentRectangle(crectangle2& brushRect, cint& rotation, crectangle2& drawRect, const brush0Type& b, const targetType& renderTarget)
 {
 	fillTransparentRectangle(brushRect, mat3x3::fromRectToRotatedRect(brushRect, rotation, drawRect), b, renderTarget);
 }
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentRectangle(crectangle2& drawRect, const brush0Type& b, const targetType& renderTarget)
 {
 	fillRectangle(renderTarget, drawRect, colorMixer<brush0Type, targetType>(b, renderTarget));
@@ -161,12 +161,12 @@ inline static void fillTransparentRectangle(crectangle2& drawRect, const color& 
 {
 	fillTransparentRectangle(drawRect, solidColorBrush(c), renderTarget);
 }
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentRectangle(crectangle2& brushRect, crectanglei2& drawRect, const brush0Type& b, const targetType& renderTarget)
 {
 	fillTransparentRectangle(brushRect, crectangle2(drawRect), b, renderTarget);
 }
-template<typename brush0Type, typename targetType>
+template<ValidBrush brush0Type, typename targetType>
 inline static void fillTransparentRectangle(crectangle2& brushRect, crectangle2& rectangleToTransform, cmat3x3& transform, const brush0Type& b, const targetType& renderTarget)
 {
 	//from brush rect to rectangleToTransform to transformed rectangle

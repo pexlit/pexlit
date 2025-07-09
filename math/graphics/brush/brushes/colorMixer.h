@@ -2,9 +2,12 @@
 #include "math/graphics/color/color.h"
 #include "math/graphics/brush/brushes/combineBrush.h"
 #include "math/graphics/color/colorFunctions.h"
-template <typename brush0Type, typename brush1Type, typename base = combinebrush<brush0Type, brush1Type>>
-struct colorMixer final : public base
+template<typename brush0Type, typename brush1Type>
+struct ColorMixerIterator;
+template <ValidBrush brush0Type, ValidBrush brush1Type>
+struct colorMixer final : public combinebrush<brush0Type, brush1Type>
 {
+	typedef combinebrush<brush0Type, brush1Type> base;
 	//top brush
 	const brush0Type& brush0;
 	//bottom brush
@@ -57,4 +60,37 @@ struct colorMixer final : public base
 		// the bottom color will be optimized away if the topcolor does not have transparency
 		// return getColor(topBrush.getValue(pos), bottomBrush.getValue(pos));
 	}
+	constexpr ColorMixerIterator<brush0Type, brush1Type> getIterator(const combinebrush<brush0Type, brush1Type>::InputType& pos) const;
 };
+
+template<typename brush0Type, typename brush1Type>
+struct ColorMixerIterator :public CombineBrushIterator<brush0Type, brush1Type, colorMixer<brush0Type, brush1Type>> {
+	typedef CombineBrushIterator< brush0Type, brush1Type, colorMixer<brush0Type, brush1Type>> base;
+	using base::base;
+	constexpr color operator*() const {
+		color topColor = *base::iterator0;
+
+		if (topColor.a() == color::maxValue)
+		{
+			return topColor;
+		}
+		else
+		{
+			ccolor& bottomColor = *base::iterator1;
+			if (topColor.a())
+			{
+				return transitionColor(topColor, bottomColor);
+			}
+			else
+			{
+				return bottomColor;
+			}
+		}
+	}
+};
+
+template<ValidBrush brush0Type, ValidBrush brush1Type>
+inline constexpr ColorMixerIterator<brush0Type, brush1Type> colorMixer<brush0Type, brush1Type>::getIterator(const combinebrush<brush0Type, brush1Type>::InputType& pos) const
+{
+	return ColorMixerIterator<brush0Type, brush1Type>(*this, pos);
+}

@@ -1,6 +1,6 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
-template<typename brush0Type>
+template<ValidBrush brush0Type>
 struct grayScaleToTransparency final : colorBrush
 {
 	const brush0Type& grayScaleBrush;

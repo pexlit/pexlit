@@ -74,7 +74,7 @@ struct baseFont
 		return vec2(widestX, -offset.y + getLineHeight());
 	}
 
-	template<typename fontBrushType, typename = std::enable_if_t < is_brush_v<fontBrushType>>>
+	template<ValidBrush fontBrushType>
 	inline vec2 DrawString(const std::wstring& text, crectangle2& rect, vec2 offset, const texture& renderTarget, const fontBrushType& b, const std::optional<mat3x3>& matrix = std::nullopt) const
 	{
 		if (text.length())
@@ -101,7 +101,7 @@ struct baseFont
 	}
 	//returns the position for the next letter like measurestring
 
-	template<typename fontBrushType, typename = std::enable_if_t<is_brush_v<fontBrushType>>>
+	template<ValidBrush fontBrushType>
 	inline vec2 DrawString(const std::wstring& text, crectangle2& rect, const texture& renderTarget, const fontBrushType& b, const std::optional<mat3x3>& matrix = std::nullopt) const
 	{
 		return DrawString(text, rect, MeasureStringOffset(rect, std::wstring()), renderTarget, b, matrix);

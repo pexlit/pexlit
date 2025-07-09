@@ -5,7 +5,7 @@
 
 // width and height MUST be a power of 2
 // https://en.wikipedia.org/wiki/Texture_mapping
-struct resolutionTexture : public colorBrush
+struct resolutionTexture : public ColorBrush
 {
 	// the resolution levels of this texture, from biggest [0] to smallest [size - 1]
 	fastArray<texture *> scaledTextures = fastArray<texture *>();
@@ -62,7 +62,8 @@ struct resolutionTexture : public colorBrush
 	// transformBrush<texture> getAntiAliasedBrush(cmat3x3& transform) const;
 	const texture &mipmap(mat3x3 &transform, rectangle2 &textureRect) const;
 
-	static texture getHalfResolution(const texture &doubleResolution);
+	static void getHalfResolution(const texture &doubleResolution, const texture& target);
+	static texture getHalfResolution(const texture& doubleResolution);
 	static texture getDoubleResolution(const texture &halfResolution);
 
 	inline fp getMultiplier(cfp &renderSizeX) const

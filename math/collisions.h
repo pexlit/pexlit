@@ -1,9 +1,62 @@
 #include "math/rectangle/rectangletn.h"
 #include "math/graphics/texture.h"
 #include "mattnxn.h"
+#include <math/Square.h>
 #pragma once
-bool collides1d(cfp& x0, cfp& w0, cfp& x1, cfp& w1);
-bool collides2d(crectangle2& r1, crectangle2& r2);
+//returns wether a rectangle intersects with another rectangle
+//doesn'T collide when the edges touch each other exactly
+template<typename T, fsize_t DimensionCount>
+bool collides(crectangletn<T, DimensionCount>& r1, crectangletn<T, DimensionCount>& r2)
+{
+	for (fsize_t dimension = 0; dimension < DimensionCount
+		; dimension++) {
+		if (r2.pos0[dimension] >= r1.pos0[dimension] + r1.size[dimension] ||
+			r1.pos0[dimension] >= r2.pos0[dimension] + r2.size[dimension])
+			return false;
+	}
+	return true;
+}
+
+//returns wether a square intersects with another square
+//doesn'T collide when the edges touch each other exactly
+template<typename T, fsize_t DimensionCount>
+bool collides(cSquaretn<T, DimensionCount>& s1, cSquaretn<T, DimensionCount>& s2)
+{
+	const T& maxDistance = s1.radius + s2.radius;
+	for (fsize_t dimension = 0; dimension < DimensionCount
+		; dimension++) {
+		if (std::abs(s1.center[dimension] - s2.center[dimension]) >= maxDistance)
+			return false;
+	}
+	return true;
+}
+
+template<typename T, fsize_t DimensionCount>
+bool contains(crectangletn<T, DimensionCount>& rContaining, crectangletn<T, DimensionCount>& rContained)
+{
+	for (fsize_t dimension = 0; dimension < DimensionCount
+		; dimension++) {
+		if (rContaining.pos0[dimension] > rContained.pos0[dimension] ||
+			rContaining.pos0[dimension] + rContaining.size[dimension] < rContained.pos0[dimension] + rContained.size[dimension])
+			return false;
+	}
+	return true;
+}
+
+template<typename T, fsize_t DimensionCount>
+bool contains(cSquaretn<T, DimensionCount>& sContaining, cSquaretn<T, DimensionCount>& sContained)
+{
+	const T& maxDistance = sContaining.radius - sContained.radius;
+	//max distance can also be negative, when the containing square is smaller than the contained square. in that case, it'll just fail at the first dimension.
+	for (fsize_t dimension = 0; dimension < DimensionCount
+		; dimension++) {
+		if (std::abs(sContaining.center[dimension] - sContained.center[dimension]) > maxDistance)
+			return false;
+	}
+	return true;
+}
+
+
 bool collides2d(texture* tex1, mat3x3 transform1, texture* tex2, mat3x3 transform2);
 bool collides2d(const std::vector<vec2>& v1, const std::vector<vec2>& v2, cbool& checkinside);
 bool collides3d(const vec3& p0, const vec3& p1, const vec3& boxp0, const vec3& boxp1);

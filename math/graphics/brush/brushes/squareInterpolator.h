@@ -4,7 +4,7 @@
 //expects requests in range [0, 1] on both axes when optimized, else in range [0, 255]
 //set optimize to linear to false when the y step != 0 when filling a row of pixels
 template<bool optimizeToLinear = true>
-struct squareInterpolator final : public brush<color, vec2>
+struct squareInterpolator final : public Brush<color, vec2>
 {
 	//layout: 0 0, 1 0, 0 1, 1 1
 	colorf cornerColors[4]{};

@@ -1,20 +1,6 @@
 #include "collisions.h"
 #include "collisions.h"
 
-bool collides1d(cfp& x0, cfp& w0, cfp& x1, cfp& w1)
-{
-	return
-		((x0 + w0) > x1) &&
-		((x1 + w1) > x0); //x
-}
-
-//returns wether a rectangle intersects with another rectangle
-//doesn'T collide when the edges touch each other exactly
-bool collides2d(crectangle2& r1, crectangle2& r2)
-{
-	return r1.pos0.x + r1.size.x > r2.pos0.x && r1.pos0.x < r2.pos0.x + r2.size.x &&//x
-		r1.pos0.y + r1.size.y > r2.pos0.y && r1.pos0.y < r2.pos0.y + r2.size.y;//y
-}
 
 //returns wether a texture intersects with another texture on alpha
 bool collides2d(texture* tex1, mat3x3 transform1, texture* img2, mat3x3 transform2)

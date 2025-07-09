@@ -264,6 +264,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\physics\gravity\BarnesHutTile.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\quaternion\Quaternion.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\PixelOrientation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\Square.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="brush">
