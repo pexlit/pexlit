@@ -1,12 +1,14 @@
 #pragma once
 #include "math/graphics/brush/brush.h"
-template <typename colorFunction>
-struct functionPointerBrush final : public ColorBrush
+template <typename resultingType, typename inputType>
+struct functionPointerBrush final : public Brush<resultingType, inputType >
 {
-	functionPointerBrush(const colorFunction&& function) :function(function) {}
-	const colorFunction&& function;
 
-	inline color getColor(cvec2& pos) const
+	//be sure to convert function pointers to a std::function!
+	functionPointerBrush(const std::function<resultingType(inputType)>& function) :function(function) {}
+	const std::function<resultingType(inputType)> function;
+
+	inline color getValue(const inputType& pos) const
 	{
 		return function(pos);
 	}

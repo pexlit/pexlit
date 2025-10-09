@@ -211,3 +211,14 @@ typedef const colorb ccolorb;
 
 typedef colortn<fp, bgraColorChannelCount> colorf;
 typedef const colorf ccolorf;
+
+// 1) Provide a std::hash<color> specialization:
+namespace std {
+	template<>
+	struct hash<color> {
+		uint operator()(const color& c) const noexcept {
+			//just return the uint value, which combines all 4 channels
+			return c.uintValue;
+		}
+	};
+}

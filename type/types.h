@@ -11,6 +11,24 @@ typename std::tuple_element<typeIndex, std::tuple<types...>>::type;
 
 template<typename... types> using firstTypeOf = nthTypeOf<0, types...>;
 
+//https://stackoverflow.com/questions/28509273/get-types-of-c-function-parameters
+template<typename Sig>
+struct signature;
+
+template<typename R, typename ...Args>
+struct signature<R(Args...)>
+{
+	using type = std::tuple<Args...>;
+	using returnValue = R;
+};
+
+template<typename F>
+concept is_function = std::is_function_v<F>;
+
+template<is_function F>
+auto arguments(const F&) -> typename signature<F>::type;
+
+
 //#include <algorithm>
 //#include <array>
 //#include <cstddef>

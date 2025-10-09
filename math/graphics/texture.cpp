@@ -50,7 +50,7 @@ void texture::Flip() const
 	color* swap0 = baseArray;
 	//swap until the mid point, because else it would be swapped back
 	//integer division, because the mid row does not have to be swapped
-	color* swap0EndPtr = swap0 + (size.x / 2) * size.y;
+	color* swap0EndPtr = swap0 + (size.y / 2) * size.x;
 	color* swap1 = swap0 + (size.y - 1) * size.x;
 	while (swap0 < swap0EndPtr)
 	{

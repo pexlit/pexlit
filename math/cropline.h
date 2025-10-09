@@ -13,6 +13,9 @@ inline bool cropLine(vec2& p0, vec2& p1, crectangle2& cropRect)
 	cvec2 difference = croppedPositions[1] - croppedPositions[0];
 
 	cfp& dydx = difference.y / difference.x;
+	//at least one axis of p0 or p1 is nan or infinity. 0 / 0 can also return nan, so we check for that case
+	if (isnan(dydx) && (difference.y || difference.x))
+		return false;
 
 	if (croppedPositions[0].x < cropRect.x)
 	{

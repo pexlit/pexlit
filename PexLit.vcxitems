@@ -116,6 +116,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\texture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\textures.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoEncoder.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoReader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\VideoSerializer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoWriter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\hashing.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\intersectable.h" />

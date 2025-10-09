@@ -265,6 +265,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\quaternion\Quaternion.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\PixelOrientation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\Square.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoReader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\VideoSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="brush">

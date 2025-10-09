@@ -20,5 +20,6 @@ void generateRandomBytes(byteIterator targetPtr, byteIterator endPtr, std::mt199
 colorb randomColor(std::mt19937& generator) {
 	colorb result = colorb();
 	generateRandomBytes(result.begin(), result.end() - 1, generator);
+	result.a() = color::maxValue;
 	return result;
 }

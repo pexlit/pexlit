@@ -156,13 +156,15 @@ inline size_t FindNearest(std::vector<size_t> positions)
 	}
 	return nearestIndex;
 }
-inline std::vector<std::wstring> split_string(const std::wstring& str, const letter& delimiter, const std::wstring& skip)
+
+template<typename StringType>
+inline std::vector<StringType> split_string(const StringType& str, const typename StringType::value_type& delimiter, const StringType& skip)
 {
-	std::vector<std::wstring> strings;
+	std::vector<StringType> strings;
 	size_t start = 0;
 	for (size_t i = 0; i < str.size(); i++)
 	{
-		const letter c = str[i];
+		const typename StringType::value_type c = str[i];
 		if (c == delimiter)
 		{
 			strings.push_back(str.substr(start, i - start));
@@ -171,10 +173,10 @@ inline std::vector<std::wstring> split_string(const std::wstring& str, const let
 		else
 		{
 			size_t index = skip.find(c, 0);
-			if (index != std::wstring::npos)
+			if (index != StringType::npos)
 			{
-				i = find(str, i + 1, std::wstring{ skip[index + 1] }, skip);
-				if (i == std::wstring::npos) break;
+				i = find(str, i + 1, StringType{ skip[index + 1] }, skip);
+				if (i == StringType::npos) break;
 			}
 		}
 	}
@@ -182,16 +184,17 @@ inline std::vector<std::wstring> split_string(const std::wstring& str, const let
 	strings.push_back(str.substr(start));
 	return strings;
 }
-inline std::vector<std::wstring> split_string(const std::wstring& str, const std::wstring& delimiter, const std::wstring& skip)
+template<typename StringType>
+inline std::vector<StringType> split_string(const StringType& str, const StringType& delimiter, const StringType& skip)
 {
-	std::vector<std::wstring> strings;
+	std::vector<StringType> strings;
 	if (str.size())
 	{
 		size_t previousIndex = 0;
 		while (true)
 		{
 			csize_t& currentIndex = find(str, previousIndex, delimiter, skip);
-			if (currentIndex == std::wstring::npos) {
+			if (currentIndex == StringType::npos) {
 				strings.push_back(str.substr(previousIndex));
 				break;
 			}
@@ -208,14 +211,14 @@ inline std::vector<std::wstring> split_string(const std::wstring& str, const std
 		return strings;
 	}
 }
-
-inline std::vector<std::wstring> split_string(const std::wstring& str, const std::wstring& delimiter)
+template<typename StringType>
+inline std::vector<StringType> split_string(const StringType& str, const StringType& delimiter)
 {
-	std::vector<std::wstring> strings;
+	std::vector<StringType> strings;
 
-	std::wstring::size_type pos = 0;
-	std::wstring::size_type prev = 0;
-	while ((pos = str.find(delimiter, prev)) != std::wstring::npos)
+	typename StringType::size_type pos = 0;
+	typename StringType::size_type prev = 0;
+	while ((pos = str.find(delimiter, prev)) != StringType::npos)
 	{
 		strings.push_back(str.substr(prev, pos - prev));
 		prev = pos + delimiter.size();

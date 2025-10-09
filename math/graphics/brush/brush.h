@@ -1,3 +1,4 @@
+#pragma once
 #include "math/graphics/color/color.h"
 //#include "interface/idestructable.h"
 #include <type_traits>
@@ -98,7 +99,6 @@ constexpr auto Brush<ResultingType, InputType>::getIterator(this const DerivedTy
 template<typename ResultingType, typename InputType>
 template<ValidBrush DerivedType>
 constexpr ResultingType Brush<ResultingType, InputType>::getValue(this const DerivedType& self, const InputType& position) {
-	auto iterator = self.getIterator();
-	iterator.setPosition(position);
+	auto iterator = self.getIterator(position);
 	return *iterator;
 }

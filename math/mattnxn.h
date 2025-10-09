@@ -364,6 +364,10 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 		}
 		return result;
 	}
+	template <fsize_t dimensionCount>
+	inline static constexpr mattnxn scale(const vectn<T, dimensionCount> scalar, const vectn<T, dimensionCount> center) {
+		return mattnxn::cross(mattnxn::translate(center), mattnxn::cross(mattnxn::scale(scalar), mattnxn::translate(-center)));
+	}
 
 	inline static constexpr mattnxn mirror(const axisID& axisIndex, const T& mirrorLocation)
 	{
