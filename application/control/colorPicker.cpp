@@ -41,7 +41,7 @@ void colorPicker::childValueChanged(const valueEventArgs& args)
 	for (int channel = 0; channel < (int)bgraColorChannelCount; channel++)
 	{
 		if (&args.sender == channelSliders[channel]) {
-			currentColor[channel] = channelSliders[channel]->value;
+			currentColor[channel] = (colorChannel)channelSliders[channel]->value;
 			break;
 		}
 	}
