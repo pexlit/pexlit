@@ -2,7 +2,6 @@
 #include "math/graphics/video/VideoSerializer.h"
 #include <array/wstringFunctions.h>
 struct videoReader : public VideoSerializer {
-	FILE* pipe;
 	size_t frameCount;
 	videoReader(const stdPath& inputFilePath) : VideoSerializer(inputFilePath) {
 		//first, get essential video info
