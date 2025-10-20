@@ -33,7 +33,8 @@ struct
 	static constexpr size_t bitSize = byteSize * ByteToBits;
 
 	static constexpr bool isByteColor = std::is_same_v<std::remove_const_t<T>, byte>;
-	static constexpr T maxValue = std::is_integral<T>::value ? std::numeric_limits<T>::max() : 1;
+	//always have 0xff as max value for integral types to make arithmetic work properly
+	static constexpr T maxValue = std::is_integral<T>::value ? 0xff : 1;// std::numeric_limits<T>::max() : 1;
 
 	static constexpr T halfMaxValue = maxValue / 2;
 	static constexpr T quarterMaxValue = maxValue / 4;

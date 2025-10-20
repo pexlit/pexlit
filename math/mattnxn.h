@@ -582,6 +582,7 @@ struct mattnxn : public vectn<vectn<T, cols>, rows>
 	// will bring x and y in the range [-1, 1]
 	// glm method
 	//fovY: fov of the screens y axis in radians
+	//standing at 0 0 0 looking at 0 0 1
 	inline static constexpr mattnxn perspectiveFov(const T& fovY, const vectn<T, 2>& screenSize, const T& zNear, const T& zFar)
 	{
 		const T& h = cos((fp)0.5 * fovY) / sin((fp)0.5 * fovY);

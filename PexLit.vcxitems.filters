@@ -267,6 +267,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\Square.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\videoReader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\video\VideoSerializer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)event\inputAxis.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthInterpolator.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthBufferVisualizer.h">
+      <Filter>brush</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\ApplyBrush.h">
+      <Filter>brush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="brush">

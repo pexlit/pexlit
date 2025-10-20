@@ -5,6 +5,8 @@
 #include "math/graphics/fillRow.h"
 #include <math/sphere/sphere.h>
 #include <math/graphics/PixelOrientation.h>
+#include "brush/brushes/DepthBufferBrush.h"
+#include "brush/brushes/DepthInterpolator.h"
 
 // the rect should be relative to the default size.
 template <ValidBrush brush0Type>
@@ -185,7 +187,7 @@ inline void fillTransformedSphere(const array2d<T>& array, const Sphere& sphere,
 
 }
 template <typename T, ValidBrush brush0Type>
-inline void fillTransformedLine(cvec3& p0, cvec3& p1, const mat4x4& transform, const array2d<T>& array, const brush0Type& brush) {
+inline void fillTransformedLine(cvec3& p0, cvec3& p1, const mat4x4& transform, const DepthBuffer& depthBuffer, const array2d<T>& array, const brush0Type& brush) {
 	vec4 perspectiveP0 = transform.multPointMatrix<4>(p0);
 	perspectiveP0 /= perspectiveP0.w;
 	vec4 perspectiveP1 = transform.multPointMatrix<4>(p1);
@@ -193,24 +195,33 @@ inline void fillTransformedLine(cvec3& p0, cvec3& p1, const mat4x4& transform, c
 	//https://learnopengl.com/Advanced-OpenGL/Depth-testing
 	constexpr fp nearPlane = 1;
 	vec2 screenP0 = vec2(perspectiveP0), screenP1 = vec2(perspectiveP1);
-	//clip
+	//clip the line right where it hits the near plane (at a Z of 1)
 	if (perspectiveP0.z > nearPlane) {
 		if (perspectiveP1.z > nearPlane) {
 			return;
 		}
 		else {
+			//interpolate based on z:
+			//z is inverse, so first invert again
+			//lerp from p0 to p1 with weight planepos
+			//at which position is the plane relatively? 0 to 1
+			//planepos = (z0 - nz) / (z1 - z0)
 			screenP0 = math::lerp(screenP1, screenP0, (perspectiveP1.z - nearPlane) / (perspectiveP1.z - perspectiveP0.z));
 		}
 	}
 	else if (perspectiveP1.z > nearPlane) {
 		screenP1 = math::lerp(screenP0, screenP1, (perspectiveP0.z - nearPlane) / (perspectiveP0.z - perspectiveP1.z));
 	}
-	fillLine(array, screenP0, screenP1, brush);
-	//now cut the line right where it hits the near plane (at a Z of -1)
+
+	vec3 transformedPoints[2] = {
+		vec3(perspectiveP0), vec3(perspectiveP1)
+	};
+	DepthBufferBrush combinedBrush = DepthBufferBrush(brush, LinearDepthInterpolator(transformedPoints), array, depthBuffer);
+	fillLine(array, screenP0, screenP1, combinedBrush);
 
 }
 
-inline void renderAxes(const mat4x4& transform, const texture& renderTarget) {
+inline void renderAxes(const mat4x4& transform, const DepthBuffer& dephtBuffer, const texture& renderTarget) {
 	constexpr color axisColors[] = {
 		colorPalette::red,
 		colorPalette::green,
@@ -220,7 +231,7 @@ inline void renderAxes(const mat4x4& transform, const texture& renderTarget) {
 	for (int axis = 0; axis < 3; axis++) {
 		vec3 directionVector = vec3();
 		directionVector[axis] = 1;
-		fillTransformedLine(vec3(), directionVector, transform, renderTarget, solidColorBrush(axisColors[axis]));
+		fillTransformedLine(vec3(), directionVector, transform, dephtBuffer, renderTarget, solidColorBrush(axisColors[axis]));
 	}
 }
 // x, y: pos00 position
@@ -530,4 +541,42 @@ inline void fillTransformedRectangle(const array2d<T>& array, rectangle2 brushRe
 		// check for clockwise
 		fillPolygon(array, positions, b);
 	}
+}
+
+template<typename T>
+//scales a texture down by a magnitude of, for example, 2, by averaging the colors.
+inline array2d<T> scaleDown(array2d<T> sourceArray, fsize_t factor) {
+	//let integer division round down
+	array2d<T> destArray = array2d<T>(sourceArray.size / factor);
+	veci2 sourceStep = veci2(factor, factor * sourceArray.size.x);
+	T* endPtr = destArray.end();
+	veci2 sourcePos{};
+	auto divisor = factor * factor;
+	T* destPtr = destArray.baseArray;
+	T* sourceTileVerticalEndPtr = sourceArray.baseArray + sourceStep.y * destArray.size.y;
+	//iterate over tiles (y)
+	for (T* sourceTileRowPtr = sourceArray.baseArray; sourceTileRowPtr != sourceTileVerticalEndPtr; sourceTileRowPtr += sourceStep.y) {
+		//iterate over tiles (x)
+		T* sourceTileRowEndPtr = sourceTileRowPtr + sourceStep.x * destArray.size.x;
+		//the pointer to the 00 corner of the source square
+		for (T* sourceTilePtr = sourceTileRowPtr; sourceTilePtr != sourceTileRowEndPtr; sourceTilePtr += sourceStep.x) {
+
+			typedef decltype(T() + T()) SumType;
+			auto sum = SumType();
+			//iterate within tiles (y)
+			T* sourceVerticalEndPtr = sourceTilePtr + sourceStep.y;
+			for (T* sourceRowPtr = sourceTilePtr; sourceRowPtr != sourceVerticalEndPtr; sourceRowPtr += sourceArray.size.x) {
+				//iterate within tiles (x)
+				T* sourceRowEndPtr = sourceRowPtr + sourceStep.x;
+				for (T* sourcePtr = sourceRowPtr; sourcePtr != sourceRowEndPtr; sourcePtr++) {
+					sum += *sourcePtr;
+				}
+			}
+			//now that we summed all of them, average them
+			*destPtr = (T)(sum / divisor);
+			destPtr++;
+			sourcePos.x++;
+		}
+	}
+	return destArray;
 }

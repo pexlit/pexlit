@@ -158,6 +158,14 @@ struct
 		//	*it = value;
 		// }
 	}
+	template<std::ranges::range ArrayType>
+	constexpr explicit vectn(const ArrayType& axis) : baseVec<T,n>(std::array<T,n>())
+	{
+		auto it = axis.begin();
+		for (T& value : this->axis) {
+			value = *it++;
+		}
+	}
 
 	constexpr vectn(const T& x, const T& y) requires(axisCount >= 2) : baseVec<T, n>(std::array<T, n>({ x, y })) {}
 
@@ -325,7 +333,7 @@ struct
 			return std::atan2(getY(), getX());
 
 		}
-		else if constexpr(rotationAxis == 1) {
+		else if constexpr (rotationAxis == 1) {
 			return std::asin(getZ());
 		}
 	}

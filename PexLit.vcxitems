@@ -49,6 +49,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)array\wstringFunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)event\eventargs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)event\eventhandler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)event\inputAxis.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)filesystem\fileFunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)filesystem\fileio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)filesystem\filemanager.h" />
@@ -83,12 +84,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\alphaMask.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\ApplyBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\bilinearInterpolator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMaximizer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMixer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\colorMultiplier.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\combineBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthBufferBrush.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthBufferVisualizer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\DepthInterpolator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\functionPointerBrush.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\grayScaleToTransparency.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)math\graphics\brush\brushes\repeatingBrush.h" />

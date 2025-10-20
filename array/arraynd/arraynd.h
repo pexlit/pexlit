@@ -276,3 +276,6 @@ using array2d = arraynd<T, 2>;
 
 template <typename T>
 using array3d = arraynd<T, 3>;
+
+//0 = front, 1 = back, so higher values are more distant.
+using DepthBuffer = array2d<fp>;

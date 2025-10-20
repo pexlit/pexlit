@@ -36,7 +36,7 @@ template <ValidBrush BrushType>
 struct RowIterator {
 	const BrushType& brush;
 	BrushType::InputType position;
-	RowIterator(const BrushType& brush, const BrushType::InputType& position) :brush(brush), position(position) {}
+	constexpr RowIterator(const BrushType& brush, const BrushType::InputType& position) :brush(brush), position(position) {}
 	template <typename DerivedType>
 	constexpr DerivedType& operator++(this DerivedType& self) {
 		self.position.x++;
