@@ -23,7 +23,7 @@ struct videoWriter : public VideoSerializer {
 		if (newFrame.size != size)
 			throw "wrong dimensions";
 		array2d<colorRGB> frame{ newFrame.size, false };
-		colorRGB* destPtr = frame.end();
+		colorRGB* filePtr = frame.end();
 		//flip upside down and convert to bgr
 		for (color* nativePtr = newFrame.begin(); nativePtr < newFrame.end(); ) {
 			filePtr -= size.x;
